@@ -1,0 +1,314 @@
+/* Toggle Component Styles */
+
+.toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  background: var(--gradient-surface);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s var(--transition-smooth);
+  white-space: nowrap;
+  user-select: none;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Size variants */
+.toggle--small {
+  padding: 6px 10px;
+  font-size: 12px;
+  min-height: 32px;
+  min-width: 32px;
+}
+
+.toggle--medium {
+  padding: 8px 12px;
+  font-size: 14px;
+  min-height: 36px;
+  min-width: 36px;
+}
+
+.toggle--large {
+  padding: 10px 16px;
+  font-size: 16px;
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Variant styles */
+.toggle--default {
+  box-shadow: var(--shadow-subtle);
+}
+
+.toggle--outline {
+  background: transparent;
+  border: 2px solid var(--border-color);
+}
+
+.toggle--ghost {
+  background: transparent;
+  border: none;
+}
+
+/* Toggle background */
+.toggle__background {
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-surface);
+  border-radius: inherit;
+  opacity: 0.8;
+  transition: opacity 0.3s;
+  z-index: -1;
+}
+
+/* Toggle content */
+.toggle__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.toggle__text {
+  flex-shrink: 0;
+}
+
+/* Toggle icon */
+.toggle__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s;
+}
+
+.toggle__icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.toggle--small .toggle__icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.toggle--large .toggle__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Active state */
+.toggle[data-state="on"] {
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 4px 16px rgba(0, 212, 255, 0.3);
+}
+
+.toggle[data-state="on"] .toggle__background {
+  opacity: 1;
+}
+
+.toggle[data-state="on"] .toggle__icon {
+  transform: scale(1.1);
+}
+
+/* Hover states */
+.toggle:hover:not(:disabled) {
+  transform: translateY(-1px) scale(1.02);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+.toggle--outline:hover:not(:disabled) {
+  background: rgba(0, 212, 255, 0.1);
+}
+
+.toggle--ghost:hover:not(:disabled) {
+  background: rgba(0, 212, 255, 0.1);
+}
+
+/* Focus states */
+.toggle:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+/* Disabled state */
+.toggle:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.toggle:disabled:hover {
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+  background: var(--gradient-surface);
+}
+
+/* Glow effect */
+.toggle--glow {
+  box-shadow: 
+    var(--shadow-subtle),
+    var(--glow-cyan);
+}
+
+.toggle__glow {
+  position: absolute;
+  inset: -2px;
+  background: var(--gradient-surface);
+  border-radius: inherit;
+  opacity: 0;
+  filter: blur(8px);
+  transition: opacity 0.3s;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.toggle--glow:hover .toggle__glow {
+  opacity: 0.4;
+}
+
+.toggle--glow[data-state="on"] .toggle__glow {
+  opacity: 0.6;
+}
+
+/* Animation effects */
+.toggle--animated {
+  animation: toggleEntrance 0.4s var(--transition-bounce);
+}
+
+@keyframes toggleEntrance {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(-5px);
+  }
+  60% {
+    transform: scale(1.05) translateY(1px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Active animation */
+.toggle[data-state="on"].toggle--animated {
+  animation: toggleActivate 0.3s var(--transition-bounce);
+}
+
+@keyframes toggleActivate {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Shimmer effect for active state */
+.toggle[data-state="on"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: toggleShimmer 2s ease-in-out infinite;
+  z-index: 1;
+  border-radius: inherit;
+}
+
+@keyframes toggleShimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Toggle group support */
+.toggle-group {
+  display: inline-flex;
+  border-radius: var(--radius-lg);
+  background: var(--gradient-surface);
+  border: 1px solid var(--border-color);
+  padding: 2px;
+  gap: 2px;
+}
+
+.toggle-group .toggle {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.toggle-group .toggle[data-state="on"] {
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+  box-shadow: var(--shadow-subtle);
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .toggle,
+  .toggle--animated {
+    animation: none;
+  }
+  
+  .toggle:hover {
+    transform: none;
+  }
+  
+  .toggle::before {
+    animation: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .toggle {
+    border: 2px solid var(--text-primary);
+    background: var(--bg-primary);
+  }
+  
+  .toggle[data-state="on"] {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+  }
+}
+
+/* Print styles */
+@media print {
+  .toggle {
+    background: white !important;
+    color: black !important;
+    border: 1px solid black !important;
+    box-shadow: none !important;
+  }
+  
+  .toggle[data-state="on"] {
+    background: black !important;
+    color: white !important;
+  }
+  
+  .toggle__glow,
+  .toggle__background {
+    display: none !important;
+  }
+}

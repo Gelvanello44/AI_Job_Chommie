@@ -1,0 +1,530 @@
+/* Tabs Component Styles */
+
+.tabs {
+  display: flex;
+  gap: var(--space-lg);
+  width: 100%;
+}
+
+.tabs--horizontal {
+  flex-direction: column;
+}
+
+.tabs--vertical {
+  flex-direction: row;
+}
+
+/* Tabs List */
+.tabs-list {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  background: var(--gradient-surface);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 4px;
+  gap: 2px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.tabs--vertical .tabs-list {
+  flex-direction: column;
+  width: fit-content;
+}
+
+/* Size variants */
+.tabs-list--small {
+  padding: 2px;
+  border-radius: var(--radius-lg);
+}
+
+.tabs-list--medium {
+  padding: 4px;
+  border-radius: var(--radius-xl);
+}
+
+.tabs-list--large {
+  padding: 6px;
+  border-radius: var(--radius-2xl);
+}
+
+/* Variant styles */
+.tabs-list--default {
+  box-shadow: var(--shadow-card);
+}
+
+.tabs-list--outlined {
+  background: transparent;
+  border: 2px solid var(--border-color);
+}
+
+.tabs-list--filled {
+  background: rgba(26, 31, 58, 0.8);
+  border: none;
+}
+
+/* Tabs list background */
+.tabs-list__background {
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-surface);
+  border-radius: inherit;
+  opacity: 0.8;
+  z-index: -1;
+}
+
+/* Tabs list content */
+.tabs-list__content {
+  position: relative;
+  z-index: 1;
+  display: contents;
+}
+
+/* Glow effect */
+.tabs-list--glow {
+  box-shadow: 
+    var(--shadow-card),
+    var(--glow-cyan);
+}
+
+.tabs-list__glow {
+  position: absolute;
+  inset: -4px;
+  background: var(--gradient-surface);
+  border-radius: inherit;
+  opacity: 0;
+  filter: blur(12px);
+  transition: opacity 0.3s;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.tabs-list--glow:hover .tabs-list__glow {
+  opacity: 0.4;
+}
+
+/* Tabs Trigger */
+.tabs-trigger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.3s var(--transition-smooth);
+  white-space: nowrap;
+  user-select: none;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.tabs--vertical .tabs-trigger {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+/* Trigger background */
+.tabs-trigger__background {
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-surface);
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: -1;
+}
+
+/* Trigger content */
+.tabs-trigger__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.tabs-trigger__text {
+  flex-shrink: 0;
+}
+
+/* Trigger icon */
+.tabs-trigger__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s;
+}
+
+.tabs-trigger__icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Trigger badge */
+.tabs-trigger__badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  background: var(--accent-pink);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 9px;
+}
+
+/* Active indicator */
+.tabs-trigger__indicator {
+  position: absolute;
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+  border-radius: var(--radius-sm);
+  opacity: 0;
+  transition: all 0.3s var(--transition-smooth);
+  z-index: -1;
+}
+
+.tabs--horizontal .tabs-trigger__indicator {
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 3px;
+}
+
+.tabs--vertical .tabs-trigger__indicator {
+  left: -2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 0;
+}
+
+/* Active state */
+.tabs-trigger[data-state="active"] {
+  color: var(--text-primary);
+  background: rgba(0, 212, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 212, 255, 0.2);
+}
+
+.tabs-trigger[data-state="active"] .tabs-trigger__background {
+  opacity: 0.8;
+}
+
+.tabs-trigger[data-state="active"] .tabs-trigger__indicator {
+  opacity: 1;
+}
+
+.tabs--horizontal .tabs-trigger[data-state="active"] .tabs-trigger__indicator {
+  width: 80%;
+}
+
+.tabs--vertical .tabs-trigger[data-state="active"] .tabs-trigger__indicator {
+  height: 80%;
+}
+
+/* Hover states */
+.tabs-trigger:hover:not([data-state="active"]):not(.tabs-trigger--disabled) {
+  color: var(--accent-cyan);
+  background: rgba(0, 212, 255, 0.05);
+}
+
+.tabs-trigger:hover:not([data-state="active"]):not(.tabs-trigger--disabled) .tabs-trigger__icon {
+  transform: scale(1.1);
+}
+
+/* Focus states */
+.tabs-trigger:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+/* Disabled state */
+.tabs-trigger--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tabs-trigger--disabled:hover {
+  color: var(--text-secondary);
+  background: transparent;
+}
+
+/* Pills variant */
+.tabs--pills .tabs-trigger {
+  border-radius: var(--radius-full);
+}
+
+.tabs--pills .tabs-trigger[data-state="active"] {
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+  color: white;
+  box-shadow: 0 4px 16px rgba(0, 212, 255, 0.3);
+}
+
+.tabs--pills .tabs-trigger__indicator {
+  display: none;
+}
+
+/* Underline variant */
+.tabs--underline .tabs-list {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-color);
+  border-radius: 0;
+  padding: 0;
+  gap: 0;
+}
+
+.tabs--underline .tabs-trigger {
+  border-radius: 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  padding-bottom: var(--space-md);
+}
+
+.tabs--underline .tabs-trigger[data-state="active"] {
+  background: transparent;
+  border-bottom-color: var(--accent-cyan);
+  box-shadow: none;
+}
+
+.tabs--underline .tabs-trigger__indicator {
+  display: none;
+}
+
+/* Minimal variant */
+.tabs--minimal .tabs-list {
+  background: transparent;
+  border: none;
+  padding: 0;
+  gap: var(--space-sm);
+}
+
+.tabs--minimal .tabs-trigger {
+  background: transparent;
+  border: 1px solid transparent;
+}
+
+.tabs--minimal .tabs-trigger[data-state="active"] {
+  border-color: var(--accent-cyan);
+  background: rgba(0, 212, 255, 0.1);
+}
+
+/* Tabs Content */
+.tabs-content {
+  flex: 1;
+  outline: none;
+  margin-top: var(--space-md);
+}
+
+.tabs--vertical .tabs-content {
+  margin-top: 0;
+  margin-left: var(--space-md);
+}
+
+/* Animated content transitions */
+.tabs-content--animated[data-state="active"] {
+  animation: tabContentShow 0.4s var(--transition-smooth);
+}
+
+.tabs-content--animated[data-state="inactive"] {
+  animation: tabContentHide 0.2s ease-in;
+}
+
+@keyframes tabContentShow {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes tabContentHide {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+  }
+}
+
+/* Trigger entrance animation */
+.tabs--animated .tabs-trigger {
+  animation: tabTriggerEntrance 0.4s var(--transition-bounce);
+}
+
+@keyframes tabTriggerEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.9);
+  }
+  60% {
+    transform: translateY(2px) scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Shimmer effect on active tab */
+.tabs-trigger[data-state="active"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: tabShimmer 2s ease-in-out infinite;
+  z-index: 0;
+  border-radius: inherit;
+}
+
+@keyframes tabShimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Notification dot for tabs */
+.tabs-trigger__notification {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 8px;
+  height: 8px;
+  background: var(--accent-pink);
+  border-radius: 50%;
+  border: 2px solid var(--bg-primary);
+  animation: notificationPulse 2s ease-in-out infinite;
+}
+
+@keyframes notificationPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .tabs-list {
+    padding: 2px;
+    gap: 1px;
+  }
+  
+  .tabs-trigger {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: 13px;
+  }
+  
+  .tabs-trigger__icon svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .tabs-trigger__badge {
+    min-width: 16px;
+    height: 16px;
+    font-size: 9px;
+  }
+  
+  .tabs--vertical {
+    flex-direction: column;
+  }
+  
+  .tabs--vertical .tabs-content {
+    margin-left: 0;
+    margin-top: var(--space-md);
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .tabs-trigger,
+  .tabs-content--animated,
+  .tabs--animated .tabs-trigger {
+    animation: none;
+  }
+  
+  .tabs-trigger::before {
+    animation: none;
+  }
+  
+  .tabs-trigger__indicator {
+    transition: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .tabs-list {
+    border: 2px solid var(--text-primary);
+    background: var(--bg-secondary);
+  }
+  
+  .tabs-trigger {
+    border: 1px solid transparent;
+  }
+  
+  .tabs-trigger[data-state="active"] {
+    border-color: var(--text-primary);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+  }
+  
+  .tabs-trigger__indicator {
+    background: var(--text-primary);
+  }
+}
+
+/* Print styles */
+@media print {
+  .tabs-list {
+    background: white !important;
+    border: 1px solid black !important;
+    box-shadow: none !important;
+  }
+  
+  .tabs-trigger {
+    background: transparent !important;
+    color: black !important;
+  }
+  
+  .tabs-trigger[data-state="active"] {
+    background: #f0f0f0 !important;
+    border: 1px solid black !important;
+  }
+  
+  .tabs-list__glow,
+  .tabs-list__background,
+  .tabs-trigger__background,
+  .tabs-trigger__indicator {
+    display: none !important;
+  }
+}

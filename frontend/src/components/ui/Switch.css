@@ -1,0 +1,415 @@
+/* Switch Component Styles */
+
+.switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  background: rgba(26, 31, 58, 0.6);
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.3s var(--transition-smooth);
+  overflow: hidden;
+  isolation: isolate;
+  outline: none;
+}
+
+.switch:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+.switch:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Size variants */
+.switch--small {
+  width: 28px;
+  height: 16px;
+}
+
+.switch--medium {
+  width: 32px;
+  height: 18px;
+}
+
+.switch--large {
+  width: 40px;
+  height: 22px;
+}
+
+/* Variant styles */
+.switch--default {
+  box-shadow: 
+    inset 0 1px 3px rgba(0, 0, 0, 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.switch--outline {
+  background: transparent;
+  border: 2px solid var(--border-color);
+}
+
+.switch--solid {
+  background: rgba(26, 31, 58, 0.8);
+  border: none;
+}
+
+/* Switch background */
+.switch__background {
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-surface);
+  border-radius: inherit;
+  opacity: 0.3;
+  transition: opacity 0.3s;
+  z-index: -1;
+}
+
+/* Color variants for checked state */
+.switch--cyan[data-state="checked"] {
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 16px rgba(0, 212, 255, 0.4);
+}
+
+.switch--purple[data-state="checked"] {
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 16px rgba(139, 92, 246, 0.4);
+}
+
+.switch--green[data-state="checked"] {
+  background: linear-gradient(135deg, var(--accent-green), #059669);
+  border-color: var(--accent-green);
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
+}
+
+.switch--yellow[data-state="checked"] {
+  background: linear-gradient(135deg, var(--accent-yellow), var(--accent-yellow-dark));
+  border-color: var(--accent-yellow);
+  box-shadow: 0 0 16px rgba(251, 191, 36, 0.4);
+}
+
+.switch--pink[data-state="checked"] {
+  background: linear-gradient(135deg, var(--accent-pink), var(--accent-pink-dark));
+  border-color: var(--accent-pink);
+  box-shadow: 0 0 16px rgba(255, 0, 110, 0.4);
+}
+
+/* Switch thumb */
+.switch__thumb {
+  position: relative;
+  display: block;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition: all 0.3s var(--transition-smooth);
+  will-change: transform;
+  overflow: hidden;
+}
+
+.switch--small .switch__thumb {
+  width: 12px;
+  height: 12px;
+  margin: 2px;
+}
+
+.switch--medium .switch__thumb {
+  width: 14px;
+  height: 14px;
+  margin: 2px;
+}
+
+.switch--large .switch__thumb {
+  width: 18px;
+  height: 18px;
+  margin: 2px;
+}
+
+/* Thumb positioning */
+.switch__thumb[data-state="unchecked"] {
+  transform: translateX(0);
+}
+
+.switch__thumb[data-state="checked"] {
+  transform: translateX(calc(100% - 4px));
+}
+
+.switch--small .switch__thumb[data-state="checked"] {
+  transform: translateX(12px);
+}
+
+.switch--medium .switch__thumb[data-state="checked"] {
+  transform: translateX(14px);
+}
+
+.switch--large .switch__thumb[data-state="checked"] {
+  transform: translateX(18px);
+}
+
+/* Thumb inner glow */
+.switch__thumb-inner {
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  border-radius: inherit;
+  opacity: 0.9;
+  transition: all 0.3s;
+}
+
+.switch[data-state="checked"] .switch__thumb-inner {
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.9) 70%,
+    rgba(0, 212, 255, 0.3) 100%
+  );
+  box-shadow: 
+    0 0 8px rgba(0, 212, 255, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* Glow effects */
+.switch--glow[data-state="checked"] {
+  box-shadow: 
+    0 0 16px rgba(0, 212, 255, 0.4),
+    var(--glow-cyan);
+}
+
+.switch__glow {
+  position: absolute;
+  inset: -4px;
+  background: inherit;
+  border-radius: inherit;
+  opacity: 0;
+  filter: blur(8px);
+  transition: opacity 0.3s;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.switch--glow[data-state="checked"] .switch__glow {
+  opacity: 0.6;
+}
+
+.switch__thumb-glow {
+  position: absolute;
+  inset: -2px;
+  background: white;
+  border-radius: inherit;
+  opacity: 0;
+  filter: blur(4px);
+  transition: opacity 0.3s;
+  z-index: -1;
+}
+
+.switch--glow[data-state="checked"] .switch__thumb-glow {
+  opacity: 0.8;
+}
+
+/* Animation effects */
+.switch--animated[data-state="checked"] {
+  animation: switchActivate 0.4s var(--transition-bounce);
+}
+
+@keyframes switchActivate {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.switch--animated .switch__thumb {
+  animation: thumbBounce 0.3s var(--transition-bounce);
+}
+
+@keyframes thumbBounce {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Hover effects */
+.switch:hover:not(:disabled) {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.1);
+}
+
+.switch:hover:not(:disabled) .switch__thumb {
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* Active state animations */
+.switch[data-state="checked"] .switch__thumb {
+  box-shadow: 
+    0 2px 8px rgba(0, 212, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* Pulse animation for thumb when active */
+.switch--animated[data-state="checked"] .switch__thumb::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  opacity: 0;
+  animation: thumbPulse 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes thumbPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* Loading state */
+.switch--loading {
+  cursor: wait;
+}
+
+.switch--loading .switch__thumb::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  border: 1px solid var(--accent-cyan);
+  border-top-color: transparent;
+  animation: switchLoading 1s linear infinite;
+}
+
+@keyframes switchLoading {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Switch with label */
+.switch-with-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  cursor: pointer;
+}
+
+.switch-with-label__label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.3s;
+  user-select: none;
+}
+
+.switch-with-label:hover .switch-with-label__label {
+  color: var(--text-primary);
+}
+
+.switch[data-state="checked"] + .switch-with-label__label {
+  color: var(--accent-cyan);
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .switch--large {
+    width: 36px;
+    height: 20px;
+  }
+  
+  .switch--large .switch__thumb {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .switch--large .switch__thumb[data-state="checked"] {
+    transform: translateX(16px);
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .switch,
+  .switch__thumb,
+  .switch--animated {
+    animation: none;
+    transition: transform 0.2s ease;
+  }
+  
+  .switch__thumb::before {
+    animation: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .switch {
+    border: 2px solid var(--text-primary);
+    background: var(--bg-primary);
+  }
+  
+  .switch[data-state="checked"] {
+    background: var(--text-primary);
+  }
+  
+  .switch__thumb {
+    background: var(--bg-primary);
+    border: 1px solid var(--text-primary);
+  }
+  
+  .switch[data-state="checked"] .switch__thumb {
+    background: var(--bg-primary);
+  }
+}
+
+/* Print styles */
+@media print {
+  .switch {
+    background: white !important;
+    border: 1px solid black !important;
+    box-shadow: none !important;
+  }
+  
+  .switch[data-state="checked"] {
+    background: black !important;
+  }
+  
+  .switch__thumb {
+    background: white !important;
+    box-shadow: 0 0 0 1px black !important;
+  }
+  
+  .switch[data-state="checked"] .switch__thumb {
+    background: white !important;
+  }
+  
+  .switch__glow,
+  .switch__background,
+  .switch__thumb-glow {
+    display: none !important;
+  }
+}

@@ -1,0 +1,440 @@
+/* Badge Component Styles */
+
+.badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  font-family: inherit;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-color);
+  background: var(--gradient-surface);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  isolation: isolate;
+  transition: all 0.3s var(--transition-smooth);
+  user-select: none;
+}
+
+/* Size variants */
+.badge--small {
+  padding: 2px 8px;
+  font-size: 10px;
+  min-height: 20px;
+}
+
+.badge--medium {
+  padding: 4px 12px;
+  font-size: 11px;
+  min-height: 24px;
+}
+
+.badge--large {
+  padding: 6px 16px;
+  font-size: 12px;
+  min-height: 28px;
+}
+
+/* Variant styles */
+.badge--default {
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 2px 12px rgba(0, 212, 255, 0.3);
+}
+
+.badge--secondary {
+  background: var(--gradient-surface);
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+}
+
+.badge--success {
+  background: linear-gradient(135deg, var(--accent-green), #059669);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 2px 12px rgba(16, 185, 129, 0.3);
+}
+
+.badge--warning {
+  background: linear-gradient(135deg, var(--accent-yellow), var(--accent-yellow-dark));
+  color: var(--bg-primary);
+  border-color: transparent;
+  box-shadow: 0 2px 12px rgba(251, 191, 36, 0.3);
+}
+
+.badge--error {
+  background: linear-gradient(135deg, var(--accent-pink), var(--accent-pink-dark));
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 2px 12px rgba(255, 0, 110, 0.3);
+}
+
+.badge--info {
+  background: linear-gradient(135deg, var(--accent-cyan), #0ea5e9);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 2px 12px rgba(0, 212, 255, 0.3);
+}
+
+.badge--outline {
+  background: transparent;
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+}
+
+.badge--ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border-color: transparent;
+}
+
+/* Badge background layer */
+.badge__background {
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  border-radius: inherit;
+  opacity: 0.8;
+  transition: opacity 0.3s;
+  z-index: -1;
+}
+
+/* Badge content */
+.badge__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.badge__text {
+  flex-shrink: 0;
+}
+
+/* Icon styling */
+.badge__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.badge__icon svg {
+  width: 12px;
+  height: 12px;
+  transition: transform 0.3s;
+}
+
+.badge--small .badge__icon svg {
+  width: 10px;
+  height: 10px;
+}
+
+.badge--large .badge__icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Dot indicator */
+.badge__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.badge--small .badge__dot {
+  width: 4px;
+  height: 4px;
+}
+
+.badge--large .badge__dot {
+  width: 8px;
+  height: 8px;
+}
+
+/* Remove button */
+.badge__remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: currentColor;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: all 0.2s;
+  border-radius: 50%;
+  padding: 2px;
+  margin-left: 2px;
+}
+
+.badge__remove:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.badge__remove svg {
+  width: 12px;
+  height: 12px;
+}
+
+.badge--small .badge__remove svg {
+  width: 10px;
+  height: 10px;
+}
+
+/* Glow effect */
+.badge--glow {
+  box-shadow: 
+    0 2px 12px rgba(0, 212, 255, 0.3),
+    var(--glow-cyan);
+}
+
+.badge__glow {
+  position: absolute;
+  inset: -2px;
+  background: inherit;
+  border-radius: inherit;
+  opacity: 0;
+  filter: blur(8px);
+  transition: opacity 0.3s;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.badge--glow:hover .badge__glow {
+  opacity: 0.5;
+}
+
+/* Pulse animation */
+.badge--pulse {
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+/* Entrance animation */
+.badge--animated {
+  animation: badgeEntrance 0.4s var(--transition-bounce);
+}
+
+@keyframes badgeEntrance {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(-10px);
+  }
+  60% {
+    transform: scale(1.05) translateY(-2px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Hover effects for interactive badges */
+.badge:hover {
+  transform: translateY(-1px) scale(1.02);
+}
+
+.badge--outline:hover {
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+  box-shadow: 0 2px 12px rgba(0, 212, 255, 0.2);
+}
+
+.badge--ghost:hover {
+  background: rgba(0, 212, 255, 0.1);
+  color: var(--accent-cyan);
+}
+
+/* Shimmer effect */
+.badge--animated::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shimmer 2s ease-in-out infinite;
+  z-index: 1;
+  border-radius: inherit;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Special dot-only badge */
+.badge--dot .badge__content {
+  padding: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.badge--dot .badge__text {
+  display: none;
+}
+
+.badge--dot.badge--small .badge__content {
+  width: 6px;
+  height: 6px;
+}
+
+.badge--dot.badge--large .badge__content {
+  width: 12px;
+  height: 12px;
+}
+
+/* Status-specific animations */
+.badge--success.badge--pulse .badge__dot {
+  animation: successPulse 1.5s ease-in-out infinite;
+}
+
+.badge--error.badge--pulse .badge__dot {
+  animation: errorPulse 1s ease-in-out infinite;
+}
+
+.badge--warning.badge--pulse .badge__dot {
+  animation: warningPulse 2s ease-in-out infinite;
+}
+
+@keyframes successPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.7;
+  }
+}
+
+@keyframes errorPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  25%, 75% {
+    transform: scale(1.1);
+  }
+  50% {
+    transform: scale(0.9);
+  }
+}
+
+@keyframes warningPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Group badges */
+.badge-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  align-items: center;
+}
+
+.badge-group .badge {
+  margin: 0;
+}
+
+/* Notification badge (for counters) */
+.badge--notification {
+  min-width: 20px;
+  padding: 2px 6px;
+  background: var(--accent-pink);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 10px;
+}
+
+.badge--notification.badge--large {
+  min-width: 24px;
+  padding: 4px 8px;
+  font-size: 11px;
+  border-radius: 12px;
+}
+
+/* Focus states */
+.badge:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .badge,
+  .badge__dot,
+  .badge--pulse,
+  .badge--animated {
+    animation: none;
+  }
+  
+  .badge:hover {
+    transform: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .badge {
+    border-width: 2px;
+    border-color: currentColor;
+  }
+  
+  .badge--outline,
+  .badge--ghost {
+    background: var(--bg-secondary);
+    border-color: var(--text-primary);
+  }
+}
+
+/* Print styles */
+@media print {
+  .badge {
+    background: white !important;
+    color: black !important;
+    border: 1px solid black !important;
+    box-shadow: none !important;
+  }
+  
+  .badge__glow,
+  .badge__background {
+    display: none !important;
+  }
+}

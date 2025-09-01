@@ -1,0 +1,327 @@
+/* Button Component Styles */
+
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: none;
+  border-radius: var(--radius-2xl);
+  cursor: pointer;
+  transition: all 0.3s var(--transition-smooth);
+  overflow: hidden;
+  isolation: isolate;
+  text-decoration: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+/* Button variants */
+.btn--primary {
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+  color: white;
+  box-shadow: 
+    0 4px 20px rgba(0, 212, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.btn--primary:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 
+    0 6px 30px rgba(0, 212, 255, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.btn--secondary {
+  background: var(--gradient-surface);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.btn--secondary:hover {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.btn--tertiary {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.btn--tertiary:hover {
+  background: rgba(0, 212, 255, 0.1);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.btn--ghost:hover {
+  background: rgba(0, 212, 255, 0.1);
+  color: var(--accent-cyan);
+}
+
+.btn--danger {
+  background: linear-gradient(135deg, var(--accent-pink), var(--accent-pink-dark));
+  color: white;
+  box-shadow: 0 4px 20px rgba(255, 0, 110, 0.3);
+}
+
+.btn--danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 30px rgba(255, 0, 110, 0.5);
+}
+
+.btn--success {
+  background: linear-gradient(135deg, var(--accent-green), #059669);
+  color: white;
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+}
+
+.btn--warning {
+  background: linear-gradient(135deg, var(--accent-yellow), var(--accent-yellow-dark));
+  color: var(--bg-primary);
+  box-shadow: 0 4px 20px rgba(251, 191, 36, 0.3);
+}
+
+/* Button sizes */
+.btn--small {
+  padding: 8px 16px;
+  font-size: 12px;
+  min-height: 36px;
+}
+
+.btn--medium {
+  padding: 12px 24px;
+  font-size: 14px;
+  min-height: 44px;
+}
+
+.btn--large {
+  padding: 16px 32px;
+  font-size: 16px;
+  min-height: 52px;
+}
+
+/* Button states */
+.btn--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.btn--loading {
+  cursor: wait;
+}
+
+.btn--loading .btn__text {
+  opacity: 0.7;
+}
+
+.btn--full-width {
+  width: 100%;
+}
+
+/* Button glow effect */
+.btn--glow {
+  box-shadow: 
+    var(--shadow-button),
+    var(--glow-cyan);
+}
+
+.btn--glow:hover {
+  box-shadow: 
+    var(--shadow-hover),
+    var(--glow-cyan-intense);
+}
+
+/* Button gradient effect */
+.btn--gradient {
+  background: var(--gradient-tertiary);
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Button content */
+.btn__content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  position: relative;
+  z-index: 2;
+}
+
+.btn__text {
+  transition: opacity 0.3s;
+}
+
+.btn__icon {
+  display: flex;
+  align-items: center;
+  transition: transform 0.3s;
+}
+
+.btn__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.btn--small .btn__icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.btn--large .btn__icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.btn:hover .btn__icon {
+  transform: scale(1.1);
+}
+
+/* Loading spinner */
+.btn__spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: var(--space-sm);
+}
+
+.btn__spinner-ring {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Ripple effect */
+.btn__ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(0);
+  animation: rippleEffect 0.6s ease-out;
+  pointer-events: none;
+}
+
+@keyframes rippleEffect {
+  to {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* Background layer */
+.btn__background {
+  position: absolute;
+  inset: 0;
+  background: inherit;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 0;
+}
+
+.btn:hover .btn__background {
+  opacity: 0.1;
+}
+
+/* Glow layer */
+.btn__glow {
+  position: absolute;
+  inset: -4px;
+  background: inherit;
+  border-radius: inherit;
+  opacity: 0;
+  filter: blur(12px);
+  transition: opacity 0.3s;
+  z-index: -1;
+}
+
+.btn--glow:hover .btn__glow {
+  opacity: 0.6;
+}
+
+/* Shimmer effect for primary buttons */
+.btn--primary::before,
+.btn--danger::before,
+.btn--success::before,
+.btn--warning::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s;
+  z-index: 1;
+}
+
+.btn--primary:hover::before,
+.btn--danger:hover::before,
+.btn--success:hover::before,
+.btn--warning:hover::before {
+  left: 100%;
+}
+
+/* Active state */
+.btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn--disabled:active {
+  transform: none;
+}
+
+/* Focus ring */
+.btn:focus-visible::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border: 2px solid var(--accent-cyan);
+  border-radius: calc(var(--radius-2xl) + 3px);
+  opacity: 0.8;
+  animation: focusPulse 2s ease-in-out infinite;
+}
+
+@keyframes focusPulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 0.4; }
+}

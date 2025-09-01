@@ -1,0 +1,355 @@
+/* StatusIndicator Component Styles */
+
+.status-indicator {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-family: inherit;
+  user-select: none;
+}
+
+/* Status indicator dot */
+.status-indicator__dot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: all 0.3s var(--transition-smooth);
+}
+
+/* Size variants for dot */
+.status-indicator--small .status-indicator__dot {
+  width: 6px;
+  height: 6px;
+}
+
+.status-indicator--large .status-indicator__dot {
+  width: 12px;
+  height: 12px;
+}
+
+/* Status colors */
+.status-indicator--connected .status-indicator__dot {
+  background: var(--accent-green);
+  box-shadow: 
+    0 0 8px var(--accent-green),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.status-indicator--disconnected .status-indicator__dot {
+  background: var(--text-dim);
+  box-shadow: 
+    0 0 8px rgba(107, 114, 128, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.status-indicator--loading .status-indicator__dot {
+  background: var(--accent-cyan);
+  box-shadow: 
+    0 0 8px var(--accent-cyan),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.status-indicator--warning .status-indicator__dot {
+  background: var(--accent-yellow);
+  box-shadow: 
+    0 0 8px var(--accent-yellow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.status-indicator--error .status-indicator__dot {
+  background: var(--accent-pink);
+  box-shadow: 
+    0 0 8px var(--accent-pink),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.status-indicator--success .status-indicator__dot {
+  background: var(--accent-green);
+  box-shadow: 
+    0 0 8px var(--accent-green),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.status-indicator--idle .status-indicator__dot {
+  background: var(--text-muted);
+  box-shadow: 
+    0 0 8px rgba(156, 163, 175, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Content area */
+.status-indicator__content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  color: var(--text-secondary);
+  transition: color 0.3s;
+}
+
+.status-indicator__content svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.3s;
+}
+
+.status-indicator--small .status-indicator__content svg {
+  width: 14px;
+  height: 14px;
+}
+
+.status-indicator--large .status-indicator__content svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Status content colors */
+.status-indicator--connected .status-indicator__content {
+  color: var(--accent-green);
+}
+
+.status-indicator--loading .status-indicator__content {
+  color: var(--accent-cyan);
+}
+
+.status-indicator--warning .status-indicator__content {
+  color: var(--accent-yellow);
+}
+
+.status-indicator--error .status-indicator__content {
+  color: var(--accent-pink);
+}
+
+.status-indicator--success .status-indicator__content {
+  color: var(--accent-green);
+}
+
+/* Label */
+.status-indicator__label {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.status-indicator--large .status-indicator__label {
+  font-size: 13px;
+}
+
+/* Animation effects */
+.status-indicator--animated .status-indicator__dot {
+  animation: statusPulse 2s ease-in-out infinite;
+}
+
+.status-indicator--animated.status-indicator--loading .status-indicator__dot {
+  animation: statusLoading 1.5s ease-in-out infinite;
+}
+
+.status-indicator--animated.status-indicator--error .status-indicator__dot {
+  animation: statusError 1s ease-in-out infinite;
+}
+
+@keyframes statusPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+@keyframes statusLoading {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 
+      0 0 8px var(--accent-cyan),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 
+      0 0 16px var(--accent-cyan),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  }
+}
+
+@keyframes statusError {
+  0%, 100% {
+    transform: scale(1);
+  }
+  25%, 75% {
+    transform: scale(1.1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+}
+
+/* Spinner animation for loading icon */
+.status-indicator__spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Pulse effect */
+.status-indicator__pulse {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: inherit;
+  opacity: 0;
+  animation: pulseExpand 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.status-indicator--small .status-indicator__pulse {
+  width: 6px;
+  height: 6px;
+}
+
+.status-indicator--large .status-indicator__pulse {
+  width: 12px;
+  height: 12px;
+}
+
+@keyframes pulseExpand {
+  0% {
+    transform: translateY(-50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-50%) scale(3);
+    opacity: 0;
+  }
+}
+
+/* Ripple effect */
+.status-indicator__ripple {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 2px solid;
+  border-color: inherit;
+  opacity: 0;
+  animation: rippleExpand 2s ease-in-out infinite 1s;
+  pointer-events: none;
+}
+
+.status-indicator--small .status-indicator__ripple {
+  width: 6px;
+  height: 6px;
+}
+
+.status-indicator--large .status-indicator__ripple {
+  width: 12px;
+  height: 12px;
+}
+
+@keyframes rippleExpand {
+  0% {
+    transform: translateY(-50%) scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-50%) scale(4);
+    opacity: 0;
+  }
+}
+
+/* Variant styles */
+.status-indicator--compact {
+  gap: var(--space-xs);
+}
+
+.status-indicator--compact .status-indicator__label {
+  font-size: 11px;
+}
+
+.status-indicator--detailed {
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--gradient-surface);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+}
+
+.status-indicator--detailed .status-indicator__label {
+  font-size: 13px;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+/* Hover effects for detailed variant */
+.status-indicator--detailed:hover {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.1);
+}
+
+/* Color inheritance for ripple and pulse */
+.status-indicator--connected .status-indicator__pulse,
+.status-indicator--connected .status-indicator__ripple {
+  background: var(--accent-green);
+  border-color: var(--accent-green);
+}
+
+.status-indicator--loading .status-indicator__pulse,
+.status-indicator--loading .status-indicator__ripple {
+  background: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+}
+
+.status-indicator--warning .status-indicator__pulse,
+.status-indicator--warning .status-indicator__ripple {
+  background: var(--accent-yellow);
+  border-color: var(--accent-yellow);
+}
+
+.status-indicator--error .status-indicator__pulse,
+.status-indicator--error .status-indicator__ripple {
+  background: var(--accent-pink);
+  border-color: var(--accent-pink);
+}
+
+.status-indicator--success .status-indicator__pulse,
+.status-indicator--success .status-indicator__ripple {
+  background: var(--accent-green);
+  border-color: var(--accent-green);
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .status-indicator__dot,
+  .status-indicator__pulse,
+  .status-indicator__ripple,
+  .status-indicator__spinner {
+    animation: none;
+  }
+  
+  .status-indicator--loading .status-indicator__dot {
+    animation: statusPulse 3s ease-in-out infinite;
+  }
+}
+
+/* Focus states for interactive variants */
+.status-indicator--detailed:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}

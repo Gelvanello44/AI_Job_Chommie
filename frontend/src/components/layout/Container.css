@@ -1,0 +1,39 @@
+/* Container Component Styles */
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  padding-left: var(--space-lg);
+  padding-right: var(--space-lg);
+  position: relative;
+  z-index: 1;
+}
+
+.container--centered {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.container--fluid {
+  max-width: 100%;
+}
+
+.container--no-padding {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Responsive padding adjustments */
+@media (max-width: 1024px) {
+  .container {
+    padding-left: var(--space-md);
+    padding-right: var(--space-md);
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding-left: var(--space-sm);
+    padding-right: var(--space-sm);
+  }
+}
