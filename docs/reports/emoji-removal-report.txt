@@ -1,0 +1,72 @@
+Emoji Removal Report
+====================
+Generated: 2025-08-28 15:54:53
+Project Directory: C:\Users\user\Downloads\home\ubuntu\ai-job-chommie-landing
+
+Summary:
+--------
+Files processed: 7
+Files containing emojis: 0
+Total emoji characters removed: 0
+
+Modified Files:
+---------------
+No files were modified (no emojis found).
+
+File Extensions Processed:
+--------------------------
+- *.py
+- *.js
+- *.ts
+- *.jsx
+- *.tsx
+- *.md
+- *.txt
+- *.json
+- *.yml
+- *.yaml
+- *.env
+- *.env.*
+- *.css
+- *.scss
+- *.html
+- *.vue
+- *.svelte
+- *.astro
+- *.xml
+- *.toml
+- *.ini
+- *.cfg
+- *.conf
+- *.sh
+- *.ps1
+- *.java
+- *.cpp
+- *.c
+- *.h
+- *.hpp
+- *.cs
+- *.rb
+- *.go
+- *.rs
+- *.swift
+- *.kt
+- *.dart
+- *.php
+- *.r
+- *.R
+
+Excluded Directories:
+--------------------
+- node_modules
+- .git
+- .vscode
+- .idea
+- dist
+- build
+- coverage
+- __pycache__
+- .pytest_cache
+- venv
+- .env
+- vendor

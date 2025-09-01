@@ -1,0 +1,1561 @@
+{
+  "info": {
+    "name": "AI Job Chommie API",
+    "description": "Comprehensive API collection for AI Job Chommie platform testing and development",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{auth_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Auto-refresh token if expired",
+          "const token = pm.collectionVariables.get('auth_token');",
+          "const tokenExpiry = pm.collectionVariables.get('token_expiry');",
+          "",
+          "if (!token || (tokenExpiry && Date.now() > tokenExpiry)) {",
+          "    console.log('Token expired or missing, skipping auto-refresh for auth endpoints');",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "token_expiry",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"SecurePassword123!\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"phone\": \"+27123456789\",\n  \"role\": \"JOB_SEEKER\",\n  \"province\": \"Gauteng\",\n  \"city\": \"Johannesburg\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Registration successful', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has user data', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('user');",
+                  "    pm.expect(responseJson.user).to.have.property('id');",
+                  "    pm.expect(responseJson.user).to.have.property('email');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"SecurePassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login successful', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response contains tokens', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('accessToken');",
+                  "    pm.expect(responseJson).to.have.property('refreshToken');",
+                  "    ",
+                  "    // Store tokens for subsequent requests",
+                  "    pm.collectionVariables.set('auth_token', responseJson.accessToken);",
+                  "    pm.collectionVariables.set('refresh_token', responseJson.refreshToken);",
+                  "    pm.collectionVariables.set('user_id', responseJson.user.id);",
+                  "    ",
+                  "    // Set token expiry (15 minutes from now)",
+                  "    const expiryTime = Date.now() + (15 * 60 * 1000);",
+                  "    pm.collectionVariables.set('token_expiry', expiryTime);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/refresh",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "refresh"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Token refresh successful', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const responseJson = pm.response.json();",
+                  "if (responseJson.accessToken) {",
+                  "    pm.collectionVariables.set('auth_token', responseJson.accessToken);",
+                  "    const expiryTime = Date.now() + (15 * 60 * 1000);",
+                  "    pm.collectionVariables.set('token_expiry', expiryTime);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Google OAuth",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idToken\": \"google_id_token_here\",\n  \"role\": \"JOB_SEEKER\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/google",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "google"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Logout successful', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Clear stored tokens",
+                  "pm.collectionVariables.set('auth_token', '');",
+                  "pm.collectionVariables.set('refresh_token', '');",
+                  "pm.collectionVariables.set('user_id', '');",
+                  "pm.collectionVariables.set('token_expiry', '');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Jobs",
+      "item": [
+        {
+          "name": "Get All Jobs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/jobs?page=1&limit=20&jobType=FULL_TIME&province=Gauteng",
+              "host": ["{{base_url}}"],
+              "path": ["jobs"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "jobType",
+                  "value": "FULL_TIME"
+                },
+                {
+                  "key": "province",
+                  "value": "Gauteng"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Jobs retrieved successfully', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has jobs array', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('jobs');",
+                  "    pm.expect(responseJson.jobs).to.be.an('array');",
+                  "});",
+                  "",
+                  "// Store first job ID for other tests",
+                  "const responseJson = pm.response.json();",
+                  "if (responseJson.jobs && responseJson.jobs.length > 0) {",
+                  "    pm.collectionVariables.set('sample_job_id', responseJson.jobs[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Job by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/jobs/{{sample_job_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["jobs", "{{sample_job_id}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Job details retrieved successfully', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Job has required fields', function () {",
+                  "    const job = pm.response.json();",
+                  "    pm.expect(job).to.have.property('id');",
+                  "    pm.expect(job).to.have.property('title');",
+                  "    pm.expect(job).to.have.property('description');",
+                  "    pm.expect(job).to.have.property('company');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Search Jobs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/jobs/search?q=software developer&location=Johannesburg&salaryMin=30000&experienceLevel=MID",
+              "host": ["{{base_url}}"],
+              "path": ["jobs", "search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "software developer"
+                },
+                {
+                  "key": "location",
+                  "value": "Johannesburg"
+                },
+                {
+                  "key": "salaryMin",
+                  "value": "30000"
+                },
+                {
+                  "key": "experienceLevel",
+                  "value": "MID"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Featured Jobs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/jobs/featured",
+              "host": ["{{base_url}}"],
+              "path": ["jobs", "featured"]
+            }
+          }
+        },
+        {
+          "name": "Save Job to Favorites",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/jobs/{{sample_job_id}}/save",
+              "host": ["{{base_url}}"],
+              "path": ["jobs", "{{sample_job_id}}", "save"]
+            }
+          }
+        },
+        {
+          "name": "Create Job Posting (Employer)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Senior Software Developer\",\n  \"description\": \"Join our dynamic team as a Senior Software Developer...\",\n  \"requirements\": \"5+ years experience in React and Node.js\",\n  \"responsibilities\": \"Lead development team, architect solutions, mentor junior developers\",\n  \"jobType\": \"FULL_TIME\",\n  \"experienceLevel\": \"SENIOR\",\n  \"province\": \"Gauteng\",\n  \"city\": \"Johannesburg\",\n  \"suburb\": \"Sandton\",\n  \"isRemote\": false,\n  \"salaryMin\": 50000,\n  \"salaryMax\": 80000,\n  \"salaryCurrency\": \"ZAR\",\n  \"salaryPeriod\": \"MONTHLY\",\n  \"showSalary\": true,\n  \"requiredSkills\": [\"React\", \"Node.js\", \"TypeScript\", \"PostgreSQL\"],\n  \"preferredSkills\": [\"AWS\", \"Docker\", \"GraphQL\"],\n  \"education\": \"Bachelor's degree in Computer Science or related field\",\n  \"applicationDeadline\": \"2024-12-31T23:59:59.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/jobs",
+              "host": ["{{base_url}}"],
+              "path": ["jobs"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Applications",
+      "item": [
+        {
+          "name": "Submit Job Application",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobId\": \"{{sample_job_id}}\",\n  \"cvId\": \"{{user_cv_id}}\",\n  \"coverLetter\": \"Dear Hiring Manager,\\n\\nI am excited to apply for this position...\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/applications",
+              "host": ["{{base_url}}"],
+              "path": ["applications"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Application submitted successfully', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const responseJson = pm.response.json();",
+                  "if (responseJson.id) {",
+                  "    pm.collectionVariables.set('sample_application_id', responseJson.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get User Applications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/applications?status=PENDING&page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["applications"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "PENDING"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Application Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/applications/{{sample_application_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["applications", "{{sample_application_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Application Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"INTERVIEW_SCHEDULED\",\n  \"interviewDate\": \"2024-12-15T10:00:00.000Z\",\n  \"internalNotes\": \"Great candidate, technical skills match requirements\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/applications/{{sample_application_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["applications", "{{sample_application_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Application Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/applications/stats",
+              "host": ["{{base_url}}"],
+              "path": ["applications", "stats"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Multilingual & Voice",
+      "item": [
+        {
+          "name": "Get Supported Languages",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/multilingual/languages",
+              "host": ["{{base_url}}"],
+              "path": ["multilingual", "languages"]
+            }
+          }
+        },
+        {
+          "name": "Translate Text",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"I am looking for a software development job in Johannesburg\",\n  \"fromLanguage\": \"en\",\n  \"toLanguage\": \"zu\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/multilingual/translate",
+              "host": ["{{base_url}}"],
+              "path": ["multilingual", "translate"]
+            }
+          }
+        },
+        {
+          "name": "Detect Language",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Ngifuna umsebenzi wekhompyutha eThekwini\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/multilingual/detect-language",
+              "host": ["{{base_url}}"],
+              "path": ["multilingual", "detect-language"]
+            }
+          }
+        },
+        {
+          "name": "Set User Language Preference",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language\": \"zu\",\n  \"useSlangTranslation\": true,\n  \"dialectVariant\": \"KwaZulu-Natal\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/multilingual/user/language",
+              "host": ["{{base_url}}"],
+              "path": ["multilingual", "user", "language"]
+            }
+          }
+        },
+        {
+          "name": "Search Jobs in User Language",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/multilingual/jobs/search?q=umsebenzi wekhompyutha&location=eThekwini",
+              "host": ["{{base_url}}"],
+              "path": ["multilingual", "jobs", "search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "umsebenzi wekhompyutha"
+                },
+                {
+                  "key": "location",
+                  "value": "eThekwini"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Speech to Text",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "multipart/form-data"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "audio",
+                  "type": "file",
+                  "src": "sample_audio.wav"
+                },
+                {
+                  "key": "language",
+                  "value": "en",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/multilingual/voice/speech-to-text",
+              "host": ["{{base_url}}"],
+              "path": ["multilingual", "voice", "speech-to-text"]
+            }
+          }
+        },
+        {
+          "name": "Text to Speech",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Welcome to AI Job Chommie! How can I help you find your next opportunity?\",\n  \"language\": \"en\",\n  \"voice\": \"neutral\",\n  \"speed\": 1.0\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/multilingual/voice/text-to-speech",
+              "host": ["{{base_url}}"],
+              "path": ["multilingual", "voice", "text-to-speech"]
+            }
+          }
+        },
+        {
+          "name": "Process Voice Command",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"command\": \"find jobs for software developer in cape town\",\n  \"language\": \"en\",\n  \"context\": {\n    \"currentPage\": \"dashboard\",\n    \"lastAction\": \"job_search\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/multilingual/voice/command",
+              "host": ["{{base_url}}"],
+              "path": ["multilingual", "voice", "command"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "Get Analytics Overview",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/analytics/overview?period=30d",
+              "host": ["{{base_url}}"],
+              "path": ["analytics", "overview"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "30d"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Application Trends",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/analytics/trends?period=90d&groupBy=week",
+              "host": ["{{base_url}}"],
+              "path": ["analytics", "trends"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "90d"
+                },
+                {
+                  "key": "groupBy",
+                  "value": "week"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Salary Benchmarking",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/analytics/salary?jobTitle=Software Developer&location=Johannesburg&experienceLevel=MID",
+              "host": ["{{base_url}}"],
+              "path": ["analytics", "salary"],
+              "query": [
+                {
+                  "key": "jobTitle",
+                  "value": "Software Developer"
+                },
+                {
+                  "key": "location",
+                  "value": "Johannesburg"
+                },
+                {
+                  "key": "experienceLevel",
+                  "value": "MID"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Skills Analysis",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/analytics/skills?industry=Technology&location=Gauteng",
+              "host": ["{{base_url}}"],
+              "path": ["analytics", "skills"],
+              "query": [
+                {
+                  "key": "industry",
+                  "value": "Technology"
+                },
+                {
+                  "key": "location",
+                  "value": "Gauteng"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "CV Management",
+      "item": [
+        {
+          "name": "Upload CV",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "multipart/form-data"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "cv",
+                  "type": "file",
+                  "src": "sample_cv.pdf"
+                },
+                {
+                  "key": "name",
+                  "value": "John Doe CV 2024",
+                  "type": "text"
+                },
+                {
+                  "key": "isPrimary",
+                  "value": "true",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/cv",
+              "host": ["{{base_url}}"],
+              "path": ["cv"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('CV uploaded successfully', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const responseJson = pm.response.json();",
+                  "if (responseJson.id) {",
+                  "    pm.collectionVariables.set('user_cv_id', responseJson.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get User CVs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/cv",
+              "host": ["{{base_url}}"],
+              "path": ["cv"]
+            }
+          }
+        },
+        {
+          "name": "Analyze CV with ATS",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobId\": \"{{sample_job_id}}\",\n  \"includeOptimizationSuggestions\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/cv/{{user_cv_id}}/analyze",
+              "host": ["{{base_url}}"],
+              "path": ["cv", "{{user_cv_id}}", "analyze"]
+            }
+          }
+        },
+        {
+          "name": "Get CV Templates",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/cv/templates?category=professional&industry=technology",
+              "host": ["{{base_url}}"],
+              "path": ["cv", "templates"],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "professional"
+                },
+                {
+                  "key": "industry",
+                  "value": "technology"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Profile",
+      "item": [
+        {
+          "name": "Get User Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/users/profile",
+              "host": ["{{base_url}}"],
+              "path": ["users", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Update User Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"bio\": \"Experienced software developer passionate about AI and machine learning\",\n  \"province\": \"Gauteng\",\n  \"city\": \"Johannesburg\",\n  \"phone\": \"+27123456789\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/profile",
+              "host": ["{{base_url}}"],
+              "path": ["users", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Update Job Seeker Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentJobTitle\": \"Senior Software Developer\",\n  \"yearsOfExperience\": 5,\n  \"expectedSalaryMin\": 45000,\n  \"expectedSalaryMax\": 70000,\n  \"noticePeriod\": \"ONE_MONTH\",\n  \"willingToRelocate\": true,\n  \"preferredLocations\": [\"Gauteng\", \"Western Cape\"],\n  \"preferredJobTypes\": [\"FULL_TIME\", \"REMOTE\"],\n  \"preferredIndustries\": [\"Technology\", \"Fintech\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/job-seeker-profile",
+              "host": ["{{base_url}}"],
+              "path": ["users", "job-seeker-profile"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Skills & Assessments",
+      "item": [
+        {
+          "name": "Get All Skills",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/skills?category=technical&inDemand=true",
+              "host": ["{{base_url}}"],
+              "path": ["skills"],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "technical"
+                },
+                {
+                  "key": "inDemand",
+                  "value": "true"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add User Skill",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skillId\": \"skill_uuid_here\",\n  \"proficiencyLevel\": \"ADVANCED\",\n  \"yearsOfExperience\": 3,\n  \"verified\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/skills",
+              "host": ["{{base_url}}"],
+              "path": ["users", "skills"]
+            }
+          }
+        },
+        {
+          "name": "Take Skills Assessment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"TECHNICAL\",\n  \"category\": \"JavaScript\",\n  \"answers\": [\n    {\n      \"questionId\": \"q1\",\n      \"answer\": \"closures\",\n      \"timeSpent\": 45\n    },\n    {\n      \"questionId\": \"q2\",\n      \"answer\": \"async/await\",\n      \"timeSpent\": 30\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/skills/assessment",
+              "host": ["{{base_url}}"],
+              "path": ["skills", "assessment"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Professional Features",
+      "item": [
+        {
+          "name": "Get Career Milestones",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/career/milestones?status=IN_PROGRESS",
+              "host": ["{{base_url}}"],
+              "path": ["career", "milestones"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "IN_PROGRESS"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Career Milestone",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Senior Developer Promotion\",\n  \"description\": \"Achieve promotion to Senior Developer role within 6 months\",\n  \"category\": \"CAREER_ADVANCEMENT\",\n  \"objective\": \"Demonstrate leadership and technical excellence\",\n  \"keyResults\": [\n    \"Lead 2 major projects successfully\",\n    \"Mentor 3 junior developers\",\n    \"Complete advanced React certification\"\n  ],\n  \"targetDate\": \"2024-06-30T23:59:59.000Z\",\n  \"checkInFrequency\": \"WEEKLY\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/career/milestones",
+              "host": ["{{base_url}}"],
+              "path": ["career", "milestones"]
+            }
+          }
+        },
+        {
+          "name": "Take Leadership Assessment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assessmentType\": \"LEADERSHIP_STYLES\",\n  \"responses\": [\n    {\n      \"questionId\": \"leadership_q1\",\n      \"response\": \"I prefer collaborative decision-making\",\n      \"score\": 4\n    },\n    {\n      \"questionId\": \"leadership_q2\",\n      \"response\": \"I adapt my leadership style to team needs\",\n      \"score\": 5\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/leadership/assessment",
+              "host": ["{{base_url}}"],
+              "path": ["leadership", "assessment"]
+            }
+          }
+        },
+        {
+          "name": "Request Personal Brand Audit",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"linkedinUrl\": \"https://linkedin.com/in/johndoe\",\n  \"portfolioUrl\": \"https://johndoe.dev\",\n  \"includeContentAnalysis\": true,\n  \"targetIndustry\": \"Technology\",\n  \"careerLevel\": \"SENIOR\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/personal-brand/audit",
+              "host": ["{{base_url}}"],
+              "path": ["personal-brand", "audit"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Interview Management",
+      "item": [
+        {
+          "name": "Schedule Interview",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"applicationId\": \"{{sample_application_id}}\",\n  \"title\": \"Technical Interview - Senior Developer Role\",\n  \"description\": \"Technical interview covering React, Node.js, and system design\",\n  \"scheduledFor\": \"2024-12-20T14:00:00.000Z\",\n  \"duration\": 60,\n  \"location\": \"Virtual - Microsoft Teams\",\n  \"meetingUrl\": \"https://teams.microsoft.com/l/meetup-join/...\",\n  \"interviewType\": \"TECHNICAL\",\n  \"timezone\": \"Africa/Johannesburg\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/interviews/schedule",
+              "host": ["{{base_url}}"],
+              "path": ["interviews", "schedule"]
+            }
+          }
+        },
+        {
+          "name": "Get User Interviews",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/interviews?upcoming=true&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["interviews"],
+              "query": [
+                {
+                  "key": "upcoming",
+                  "value": "true"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Request Reference",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"referenceName\": \"Jane Smith\",\n  \"referenceEmail\": \"jane.smith@company.com\",\n  \"referencePhone\": \"+27987654321\",\n  \"company\": \"Tech Solutions Inc\",\n  \"position\": \"Engineering Manager\",\n  \"relationship\": \"Direct Manager\",\n  \"requestMessage\": \"Hi Jane, I hope you're well. I'm applying for a new position and would appreciate if you could provide a reference...\",\n  \"jobTitle\": \"Senior Software Developer\",\n  \"urgency\": \"MEDIUM\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/references/request",
+              "host": ["{{base_url}}"],
+              "path": ["references", "request"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Subscription Management",
+      "item": [
+        {
+          "name": "Get Subscription Plans",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/subscriptions/plans",
+              "host": ["{{base_url}}"],
+              "path": ["subscriptions", "plans"]
+            }
+          }
+        },
+        {
+          "name": "Subscribe to Plan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"planId\": \"PROFESSIONAL\",\n  \"billingCycle\": \"MONTHLY\",\n  \"paymentMethod\": \"CARD\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/subscriptions/subscribe",
+              "host": ["{{base_url}}"],
+              "path": ["subscriptions", "subscribe"]
+            }
+          }
+        },
+        {
+          "name": "Get User Subscription",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/subscriptions/current",
+              "host": ["{{base_url}}"],
+              "path": ["subscriptions", "current"]
+            }
+          }
+        },
+        {
+          "name": "Process Paystack Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-paystack-signature",
+                "value": "webhook_signature_here"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"charge.success\",\n  \"data\": {\n    \"id\": 123456789,\n    \"status\": \"success\",\n    \"reference\": \"subscription_ref_123\",\n    \"amount\": 800,\n    \"currency\": \"ZAR\",\n    \"customer\": {\n      \"email\": \"test@example.com\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/webhooks/paystack",
+              "host": ["{{base_url}}"],
+              "path": ["webhooks", "paystack"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Job Alerts",
+      "item": [
+        {
+          "name": "Create Job Alert",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Senior Developer Jobs in Johannesburg\",\n  \"criteria\": {\n    \"keywords\": [\"senior developer\", \"software engineer\"],\n    \"location\": \"Johannesburg\",\n    \"jobType\": \"FULL_TIME\",\n    \"experienceLevel\": \"SENIOR\",\n    \"salaryMin\": 50000,\n    \"industries\": [\"Technology\", \"Fintech\"]\n  },\n  \"frequency\": \"DAILY\",\n  \"active\": true,\n  \"notificationChannels\": [\"EMAIL\", \"PUSH\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/job-alerts",
+              "host": ["{{base_url}}"],
+              "path": ["job-alerts"]
+            }
+          }
+        },
+        {
+          "name": "Get User Job Alerts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/job-alerts?active=true",
+              "host": ["{{base_url}}"],
+              "path": ["job-alerts"],
+              "query": [
+                {
+                  "key": "active",
+                  "value": "true"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Job Alert",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Alert Name\",\n  \"frequency\": \"WEEKLY\",\n  \"active\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/job-alerts/{{job_alert_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["job-alerts", "{{job_alert_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Company Management",
+      "item": [
+        {
+          "name": "Get Companies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/companies?verified=true&industry=Technology",
+              "host": ["{{base_url}}"],
+              "path": ["companies"],
+              "query": [
+                {
+                  "key": "verified",
+                  "value": "true"
+                },
+                {
+                  "key": "industry",
+                  "value": "Technology"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Company Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/companies/{{company_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["companies", "{{company_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Company Research",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/companies/{{company_id}}/research",
+              "host": ["{{base_url}}"],
+              "path": ["companies", "{{company_id}}", "research"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "AI Matching",
+      "item": [
+        {
+          "name": "Get Job Matches",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/matching/jobs?minScore=0.7&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["matching", "jobs"],
+              "query": [
+                {
+                  "key": "minScore",
+                  "value": "0.7"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Match Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/matching/jobs/{{sample_job_id}}/score",
+              "host": ["{{base_url}}"],
+              "path": ["matching", "jobs", "{{sample_job_id}}", "score"]
+            }
+          }
+        },
+        {
+          "name": "Update Matching Preferences",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skillsWeight\": 0.4,\n  \"experienceWeight\": 0.3,\n  \"locationWeight\": 0.2,\n  \"salaryWeight\": 0.1,\n  \"minimumMatchScore\": 0.6\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/matching/preferences",
+              "host": ["{{base_url}}"],
+              "path": ["matching", "preferences"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Get User Notifications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/notifications?unread=true&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["notifications"],
+              "query": [
+                {
+                  "key": "unread",
+                  "value": "true"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/notifications/{{notification_id}}/read",
+              "host": ["{{base_url}}"],
+              "path": ["notifications", "{{notification_id}}", "read"]
+            }
+          }
+        },
+        {
+          "name": "Update Notification Preferences",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"emailNotifications\": true,\n  \"pushNotifications\": true,\n  \"smsNotifications\": false,\n  \"jobAlerts\": true,\n  \"applicationUpdates\": true,\n  \"marketingEmails\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/notifications/preferences",
+              "host": ["{{base_url}}"],
+              "path": ["notifications", "preferences"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health & System",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('System is healthy', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('All services are operational', function () {",
+                  "    const health = pm.response.json();",
+                  "    pm.expect(health.database.status).to.equal('healthy');",
+                  "    pm.expect(health.redis.status).to.equal('healthy');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/status",
+              "host": ["{{base_url}}"],
+              "path": ["status"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

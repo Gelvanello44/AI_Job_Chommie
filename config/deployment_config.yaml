@@ -1,0 +1,286 @@
+# AI Job Chommie Production Deployment Configuration
+# Version: 1.0
+# Last Updated: 2024-12-27
+
+# Application Information
+application:
+  name: ai-job-chommie
+  version: 1.0.0
+  environment: production
+  description: AI-powered job matching platform with unlimited local inference
+
+# Server Configuration
+server:
+  host: 0.0.0.0
+  port: 5000
+  workers: 4  # Number of worker processes
+  threads: 8  # Threads per worker
+  timeout: 300  # Request timeout in seconds
+  max_requests: 1000  # Max requests per worker before restart
+  max_requests_jitter: 100  # Jitter for max requests
+  graceful_timeout: 30  # Graceful shutdown timeout
+
+# Model Configuration
+models:
+  embeddings:
+    name: sentence-transformers/all-MiniLM-L6-v2
+    version: v1.1
+    device: auto  # auto, cpu, cuda
+    batch_size: 32
+    max_sequence_length: 256
+    optimization_level: O2
+    quantization: int8
+    preload: true
+    fallback_version: v1.0
+    
+  classification:
+    name: facebook/bart-large-mnli
+    version: v1.0
+    device: auto
+    batch_size: 8
+    max_sequence_length: 512
+    optimization_level: O1
+    quantization: fp16
+    preload: true
+    
+  ner:
+    name: dslim/bert-base-NER
+    version: v1.0
+    device: auto
+    batch_size: 16
+    max_sequence_length: 256
+    optimization_level: O2
+    quantization: int8
+    preload: true
+
+# Resource Limits
+resources:
+  memory:
+    max_total_gb: 6  # Maximum total memory usage
+    per_model_mb: 500  # Max memory per model
+    cache_size_mb: 2000  # Cache size
+    
+  cpu:
+    threads: 8  # CPU threads to use
+    threshold_percent: 80  # CPU usage threshold for alerts
+    
+  gpu:
+    enabled: false  # GPU usage (set to true if available)
+    memory_fraction: 0.8  # GPU memory fraction to use
+
+# Performance Settings
+performance:
+  max_concurrent_requests: 50
+  request_queue_size: 100
+  batch_processing: true
+  batch_timeout_ms: 100
+  enable_caching: true
+  cache_ttl_seconds: 3600
+  enable_model_warmup: true
+  warmup_samples: 3
+
+# Monitoring Configuration
+monitoring:
+  enabled: true
+  interval_seconds: 60
+  retention_hours: 168  # 7 days
+  
+  metrics:
+    - name: system_metrics
+      enabled: true
+      interval: 60
+    - name: model_performance
+      enabled: true
+      interval: 30
+    - name: request_metrics
+      enabled: true
+      interval: 10
+      
+  alerts:
+    - name: high_cpu_usage
+      metric: cpu_usage_percent
+      threshold: 85
+      condition: gt
+      duration_seconds: 120
+      severity: warning
+      
+    - name: high_memory_usage
+      metric: memory_usage_percent
+      threshold: 90
+      condition: gt
+      duration_seconds: 60
+      severity: critical
+      
+    - name: slow_inference
+      metric: avg_inference_time_ms
+      threshold: 2000
+      condition: gt
+      duration_seconds: 180
+      severity: warning
+      
+    - name: high_error_rate
+      metric: error_rate
+      threshold: 0.05
+      condition: gt
+      duration_seconds: 60
+      severity: critical
+
+# Logging Configuration
+logging:
+  level: INFO
+  format: json  # json or text
+  
+  handlers:
+    - type: file
+      filename: logs/app.log
+      max_bytes: 104857600  # 100MB
+      backup_count: 10
+      
+    - type: file
+      filename: logs/error.log
+      level: ERROR
+      max_bytes: 52428800  # 50MB
+      backup_count: 5
+      
+    - type: console
+      level: INFO
+
+# Security Configuration
+security:
+  enable_https: true
+  ssl_cert_path: /etc/ssl/certs/ai-job-chommie.crt
+  ssl_key_path: /etc/ssl/private/ai-job-chommie.key
+  
+  cors:
+    enabled: true
+    origins:
+      - http://localhost:3000
+      - https://ai-job-chommie.com
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    credentials: true
+    
+  rate_limiting:
+    enabled: true
+    default_limit: 100  # Requests per minute
+    burst: 20
+    
+  authentication:
+    jwt_secret_env: JWT_ACCESS_SECRET
+    token_expiry: 900  # 15 minutes
+    refresh_expiry: 604800  # 7 days
+
+# Database Configuration
+database:
+  url_env: DATABASE_URL
+  pool_size: 20
+  max_overflow: 10
+  pool_timeout: 30
+  pool_recycle: 3600
+  echo: false
+
+# Redis Configuration
+redis:
+  url_env: REDIS_URL
+  max_connections: 50
+  decode_responses: true
+  health_check_interval: 30
+  
+  caching:
+    enabled: true
+    default_ttl: 3600
+    max_entries: 10000
+
+# Health Check Configuration
+health_check:
+  enabled: true
+  endpoint: /health
+  interval_seconds: 30
+  timeout_seconds: 5
+  
+  checks:
+    - name: database
+      type: database
+      critical: true
+    - name: redis
+      type: redis
+      critical: true
+    - name: models
+      type: models
+      critical: true
+    - name: disk_space
+      type: disk
+      threshold_gb: 1
+      critical: false
+
+# Backup Configuration
+backup:
+  enabled: true
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention_days: 30
+  
+  targets:
+    - type: database
+      compression: gzip
+    - type: logs
+      compression: gzip
+    - type: models
+      compression: none
+
+# Deployment Settings
+deployment:
+  strategy: rolling  # rolling, blue-green, canary
+  health_check_interval: 10
+  startup_timeout: 300
+  shutdown_timeout: 30
+  
+  autoscaling:
+    enabled: false  # Enable if using container orchestration
+    min_replicas: 2
+    max_replicas: 10
+    target_cpu_percent: 70
+    target_memory_percent: 80
+
+# Service Dependencies
+services:
+  backend:
+    url: http://localhost:3001
+    health_endpoint: /api/v1/health
+    timeout: 30
+    retry_attempts: 3
+    
+  job_scraping:
+    enabled: true
+    workers: 2
+    queue_size: 1000
+    
+  monitoring_dashboard:
+    enabled: true
+    port: 3002
+    auth_required: true
+
+# Feature Flags
+features:
+  unlimited_inference: true
+  batch_processing: true
+  model_quantization: true
+  advanced_caching: true
+  performance_monitoring: true
+  auto_recovery: true
+  gradual_rollout: false
+
+# Environment Variables (to be set separately)
+# Required environment variables:
+# - DATABASE_URL
+# - REDIS_URL
+# - JWT_ACCESS_SECRET
+# - JWT_REFRESH_SECRET
+# - ADMIN_API_KEY
+# - ENCRYPTION_KEY
+# - SENTRY_DSN (optional)
+
+# Maintenance Mode
+maintenance:
+  enabled: false
+  message: "System maintenance in progress. Please try again later."
+  allowed_ips:
+    - 127.0.0.1
