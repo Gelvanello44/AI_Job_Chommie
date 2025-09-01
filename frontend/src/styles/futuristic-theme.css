@@ -1,0 +1,502 @@
+/* Futuristic Theme CSS - Inspired by EV Charging Interface */
+
+:root {
+  /* Primary Colors */
+  --cyan-primary: #00ffff;
+  --cyan-dark: #00cccc;
+  --cyan-light: #66ffff;
+  
+  /* Accent Colors */
+  --pink-accent: #ff00ff;
+  --pink-dark: #cc00cc;
+  --pink-light: #ff66ff;
+  
+  --purple-accent: #9945ff;
+  --purple-dark: #6b2fcc;
+  --purple-light: #b366ff;
+  
+  /* Background Colors */
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #141420;
+  --bg-tertiary: #1a1a2e;
+  
+  /* Glass Effect */
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, var(--cyan-primary), var(--purple-accent));
+  --gradient-secondary: linear-gradient(135deg, var(--pink-accent), var(--cyan-primary));
+  --gradient-dark: linear-gradient(135deg, #1a1a2e, #0a0a0f);
+  
+  /* Shadows */
+  --glow-cyan: 0 0 20px rgba(0, 255, 255, 0.5);
+  --glow-pink: 0 0 20px rgba(255, 0, 255, 0.5);
+  --glow-purple: 0 0 20px rgba(153, 69, 255, 0.5);
+  
+  /* Animation Durations */
+  --animation-fast: 0.3s;
+  --animation-medium: 0.6s;
+  --animation-slow: 1s;
+}
+
+/* Energy Line Animation */
+@keyframes energy-flow {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -100;
+  }
+}
+
+/* Pulse Animation */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+/* Rotating Ring Animation */
+@keyframes rotate-ring {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Float Animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Gradient Shift Animation */
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Energy Particle Animation */
+@keyframes particle-rise {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) scale(0.5);
+    opacity: 0;
+  }
+}
+
+/* Glitch Effect */
+@keyframes glitch {
+  0%, 100% {
+    text-shadow: 
+      0.05em 0 0 var(--cyan-primary),
+      -0.05em -0.025em 0 var(--pink-accent),
+      0.025em 0.05em 0 var(--purple-accent);
+  }
+  15% {
+    text-shadow: 
+      0.05em 0 0 var(--cyan-primary),
+      -0.05em -0.025em 0 var(--pink-accent),
+      0.025em 0.05em 0 var(--purple-accent);
+  }
+  16% {
+    text-shadow: 
+      -0.05em -0.025em 0 var(--cyan-primary),
+      0.025em 0.025em 0 var(--pink-accent),
+      -0.05em -0.05em 0 var(--purple-accent);
+  }
+  49% {
+    text-shadow: 
+      -0.05em -0.025em 0 var(--cyan-primary),
+      0.025em 0.025em 0 var(--pink-accent),
+      -0.05em -0.05em 0 var(--purple-accent);
+  }
+  50% {
+    text-shadow: 
+      0.025em 0.05em 0 var(--cyan-primary),
+      0.05em 0 0 var(--pink-accent),
+      0 -0.05em 0 var(--purple-accent);
+  }
+  99% {
+    text-shadow: 
+      0.025em 0.05em 0 var(--cyan-primary),
+      0.05em 0 0 var(--pink-accent),
+      0 -0.05em 0 var(--purple-accent);
+  }
+}
+
+/* Base Styles */
+.futuristic-container {
+  background: var(--bg-primary);
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Glass Card */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  transition: all var(--animation-fast) ease;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--gradient-primary);
+  opacity: 0.5;
+}
+
+.glass-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--glow-cyan);
+  border-color: var(--cyan-primary);
+}
+
+/* Energy Button */
+.energy-button {
+  background: var(--gradient-primary);
+  background-size: 200% 200%;
+  border: none;
+  border-radius: 50px;
+  color: white;
+  font-weight: bold;
+  padding: 1rem 2rem;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all var(--animation-fast) ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  animation: gradient-shift 3s ease infinite;
+}
+
+.energy-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.energy-button:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.energy-button:hover {
+  transform: scale(1.05);
+  box-shadow: var(--glow-cyan);
+}
+
+/* Glowing Title */
+.glowing-title {
+  font-size: 4rem;
+  font-weight: bold;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-align: center;
+  position: relative;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.glowing-title::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: -1;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: blur(10px);
+  opacity: 0.5;
+}
+
+/* Energy Bar */
+.energy-bar {
+  width: 100%;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid var(--glass-border);
+}
+
+.energy-bar-fill {
+  height: 100%;
+  background: var(--gradient-primary);
+  border-radius: 15px;
+  position: relative;
+  overflow: hidden;
+  transition: width 1s ease;
+  animation: gradient-shift 3s ease infinite;
+}
+
+.energy-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Rotating Energy Ring */
+.energy-ring {
+  width: 200px;
+  height: 200px;
+  position: relative;
+}
+
+.energy-ring-outer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 3px solid transparent;
+  border-top-color: var(--cyan-primary);
+  border-right-color: var(--purple-accent);
+  border-radius: 50%;
+  animation: rotate-ring 2s linear infinite;
+}
+
+.energy-ring-inner {
+  position: absolute;
+  width: 80%;
+  height: 80%;
+  top: 10%;
+  left: 10%;
+  border: 2px solid transparent;
+  border-bottom-color: var(--pink-accent);
+  border-left-color: var(--cyan-primary);
+  border-radius: 50%;
+  animation: rotate-ring 1.5s linear infinite reverse;
+}
+
+/* Particle System */
+.particle-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.energy-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--cyan-primary);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--cyan-primary);
+  animation: particle-rise 10s infinite;
+}
+
+.energy-particle:nth-child(odd) {
+  background: var(--pink-accent);
+  box-shadow: 0 0 10px var(--pink-accent);
+  animation-duration: 12s;
+}
+
+.energy-particle:nth-child(3n) {
+  background: var(--purple-accent);
+  box-shadow: 0 0 10px var(--purple-accent);
+  animation-duration: 15s;
+}
+
+/* Grid Background */
+.grid-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+  opacity: 0.3;
+  animation: grid-move 20s linear infinite;
+}
+
+@keyframes grid-move {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(50px, 50px);
+  }
+}
+
+/* Feature Card with Energy Effect */
+.feature-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  transition: all var(--animation-fast) ease;
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: var(--gradient-primary);
+  border-radius: 20px;
+  opacity: 0;
+  z-index: -1;
+  transition: opacity var(--animation-fast) ease;
+}
+
+.feature-card:hover::before {
+  opacity: 1;
+}
+
+.feature-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  border-color: transparent;
+}
+
+/* Animated Number Counter */
+.counter {
+  font-size: 3rem;
+  font-weight: bold;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Loading Spinner */
+.energy-spinner {
+  width: 50px;
+  height: 50px;
+  position: relative;
+  animation: rotate-ring 1s linear infinite;
+}
+
+.energy-spinner::before,
+.energy-spinner::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+}
+
+.energy-spinner::before {
+  width: 100%;
+  height: 100%;
+  border: 3px solid transparent;
+  border-top-color: var(--cyan-primary);
+  border-bottom-color: var(--purple-accent);
+}
+
+.energy-spinner::after {
+  width: 70%;
+  height: 70%;
+  top: 15%;
+  left: 15%;
+  border: 2px solid transparent;
+  border-left-color: var(--pink-accent);
+  border-right-color: var(--cyan-primary);
+  animation: rotate-ring 0.6s linear infinite reverse;
+}
+
+/* Hover Glow Effect */
+.hover-glow {
+  transition: all var(--animation-fast) ease;
+}
+
+.hover-glow:hover {
+  box-shadow: 
+    0 0 20px var(--cyan-primary),
+    inset 0 0 20px rgba(0, 255, 255, 0.1);
+}
+
+/* Text Glow */
+.text-glow {
+  text-shadow: 
+    0 0 10px var(--cyan-primary),
+    0 0 20px var(--cyan-primary),
+    0 0 30px var(--cyan-primary);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .glowing-title {
+    font-size: 2.5rem;
+  }
+  
+  .counter {
+    font-size: 2rem;
+  }
+  
+  .glass-card {
+    padding: 1.5rem;
+  }
+}

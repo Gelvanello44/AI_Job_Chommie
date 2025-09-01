@@ -1,0 +1,82 @@
+{
+  "app": {
+    "name": "AI Job Chommie",
+    "tagline": "Umlingani Wakho Wemisebenzi Onamandla we-AI eNingizimu Afrika",
+    "description": "Thola umsebenzi wamaphupho akho ngosizo lwe-AI"
+  },
+  "navigation": {
+    "home": "Ikhaya",
+    "jobs": "Imisebenzi",
+    "cvBuilder": "Yakha i-CV",
+    "dashboard": "I-Dashboard",
+    "employers": "Abaqashi",
+    "about": "Mayelana Nathi",
+    "contact": "Xhumana Nathi",
+    "login": "Ngena",
+    "register": "Bhalisa",
+    "logout": "Phuma",
+    "profile": "Iphrofayela",
+    "settings": "Izilungiselelo"
+  },
+  "homepage": {
+    "hero": {
+      "title": "Thola Umsebenzi Wamaphupho Akho nge-AI",
+      "subtitle": "Ukufaniswa kwemisebenzi okuhlakaniphile kochwepheshe baseNingizimu Afrika",
+      "searchPlaceholder": "Sesha imisebenzi, izinkampani, noma amakhono...",
+      "searchButton": "Sesha Imisebenzi",
+      "voiceSearch": "Ukusesha Ngezwi"
+    },
+    "features": {
+      "title": "Kungani Ukhetha i-AI Job Chommie?",
+      "aiMatching": {
+        "title": "Ukufaniswa Komsebenzi kwe-AI",
+        "description": "I-AI yethu ihlaziya amakhono akho nezintandokazi zakho ukuze ithole ukufaniswa komsebenzi okuphelele"
+      },
+      "cvBuilder": {
+        "title": "Umakhi we-CV Ohlakaniphile",
+        "description": "Dala ama-CV ochwepheshe ngeziphakamiso ezinamandla ze-AI"
+      },
+      "multilingualSupport": {
+        "title": "Izilimi ezingu-11 zase-SA",
+        "description": "Zulazula ngolimi lwakho olukhethayo lwaseNingizimu Afrika"
+      },
+      "voiceOperation": {
+        "title": "Ukulawula Ngezwi",
+        "description": "Sesha futhi uzulazule usebenzisa imiyalo yezwi"
+      }
+    },
+    "stats": {
+      "jobsPosted": "Imisebenzi Efakiwe",
+      "activeUsers": "Abasebenzisi Abasebenzayo",
+      "companiesRegistered": "Izinkampani",
+      "successStories": "Izindaba Zempumelelo"
+    }
+  },
+  "common": {
+    "loading": "Iyalayisha...",
+    "error": "Kube nephutha",
+    "retry": "Zama futhi",
+    "cancel": "Khansela",
+    "confirm": "Qinisekisa",
+    "save": "Londoloza",
+    "delete": "Susa",
+    "edit": "Hlela",
+    "view": "Buka",
+    "close": "Vala",
+    "search": "Sesha",
+    "filter": "Hlunga",
+    "sort": "Hlunga",
+    "share": "Yabelana",
+    "download": "Landa",
+    "upload": "Layisha",
+    "submit": "Thumela",
+    "next": "Okulandelayo",
+    "previous": "Okwandulela",
+    "back": "Emuva",
+    "continue": "Qhubeka",
+    "yes": "Yebo",
+    "no": "Cha",
+    "optional": "Ongakukhethi",
+    "required": "Kudingekile"
+  }
+}

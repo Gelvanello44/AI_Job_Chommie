@@ -1,0 +1,215 @@
+{
+  "app": {
+    "name": "AI Job Chommie",
+    "tagline": "Your AI-Powered Career Partner in South Africa",
+    "description": "Find your dream job with AI assistance"
+  },
+  "navigation": {
+    "home": "Home",
+    "jobs": "Jobs",
+    "cvBuilder": "CV Builder",
+    "dashboard": "Dashboard",
+    "employers": "For Employers",
+    "about": "About",
+    "contact": "Contact",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "profile": "Profile",
+    "settings": "Settings"
+  },
+  "homepage": {
+    "hero": {
+      "title": "Find Your Dream Job with AI",
+      "subtitle": "Intelligent job matching for South African professionals",
+      "searchPlaceholder": "Search for jobs, companies, or skills...",
+      "searchButton": "Search Jobs",
+      "voiceSearch": "Voice Search"
+    },
+    "features": {
+      "title": "Why Choose AI Job Chommie?",
+      "aiMatching": {
+        "title": "AI Job Matching",
+        "description": "Our AI analyzes your skills and preferences to find perfect job matches"
+      },
+      "cvBuilder": {
+        "title": "Smart CV Builder",
+        "description": "Create professional CVs with AI-powered suggestions"
+      },
+      "multilingualSupport": {
+        "title": "11 SA Languages",
+        "description": "Navigate in your preferred South African language"
+      },
+      "voiceOperation": {
+        "title": "Voice Control",
+        "description": "Search and navigate using voice commands"
+      }
+    },
+    "stats": {
+      "jobsPosted": "Jobs Posted",
+      "activeUsers": "Active Users",
+      "companiesRegistered": "Companies",
+      "successStories": "Success Stories"
+    }
+  },
+  "jobSearch": {
+    "title": "Job Search",
+    "filters": {
+      "location": "Location",
+      "category": "Category",
+      "experience": "Experience Level",
+      "salary": "Salary Range",
+      "jobType": "Job Type",
+      "remote": "Remote Options",
+      "applyFilters": "Apply Filters",
+      "clearFilters": "Clear Filters"
+    },
+    "results": {
+      "showing": "Showing {{count}} results",
+      "sortBy": "Sort by",
+      "relevance": "Relevance",
+      "date": "Date Posted",
+      "salary": "Salary",
+      "noResults": "No jobs found matching your criteria"
+    },
+    "jobCard": {
+      "apply": "Apply Now",
+      "save": "Save Job",
+      "share": "Share",
+      "viewDetails": "View Details",
+      "postedOn": "Posted {{date}}",
+      "deadline": "Deadline: {{date}}",
+      "applicants": "{{count}} applicants"
+    }
+  },
+  "cvBuilder": {
+    "title": "CV Builder",
+    "steps": {
+      "personalInfo": "Personal Information",
+      "education": "Education",
+      "experience": "Work Experience",
+      "skills": "Skills",
+      "references": "References",
+      "preview": "Preview"
+    },
+    "actions": {
+      "save": "Save CV",
+      "download": "Download PDF",
+      "email": "Email CV",
+      "next": "Next",
+      "previous": "Previous",
+      "complete": "Complete"
+    },
+    "templates": {
+      "title": "Choose a Template",
+      "professional": "Professional",
+      "modern": "Modern",
+      "creative": "Creative",
+      "simple": "Simple"
+    }
+  },
+  "dashboard": {
+    "title": "My Dashboard",
+    "welcome": "Welcome back, {{name}}!",
+    "sections": {
+      "overview": "Overview",
+      "applications": "My Applications",
+      "savedJobs": "Saved Jobs",
+      "profile": "Profile Completion",
+      "notifications": "Notifications",
+      "stats": "Statistics"
+    },
+    "applications": {
+      "pending": "Pending",
+      "reviewed": "Reviewed",
+      "shortlisted": "Shortlisted",
+      "rejected": "Rejected",
+      "accepted": "Accepted"
+    },
+    "quickActions": {
+      "updateCV": "Update CV",
+      "searchJobs": "Search Jobs",
+      "viewProfile": "View Profile",
+      "settings": "Settings"
+    }
+  },
+  "employer": {
+    "title": "Employer Portal",
+    "dashboard": {
+      "title": "Employer Dashboard",
+      "postJob": "Post New Job",
+      "manageJobs": "Manage Jobs",
+      "viewApplicants": "View Applicants",
+      "analytics": "Analytics",
+      "companyProfile": "Company Profile"
+    },
+    "jobPosting": {
+      "title": "Post a Job",
+      "jobTitle": "Job Title",
+      "description": "Job Description",
+      "requirements": "Requirements",
+      "benefits": "Benefits",
+      "location": "Location",
+      "salaryRange": "Salary Range",
+      "postJob": "Post Job",
+      "saveDraft": "Save as Draft"
+    }
+  },
+  "voice": {
+    "listening": "Listening...",
+    "speak": "Speak now",
+    "processing": "Processing...",
+    "commands": {
+      "searchJobs": "Search for {{query}}",
+      "openCV": "Open CV Builder",
+      "viewApplications": "Show my applications",
+      "help": "Help"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "share": "Share",
+    "download": "Download",
+    "upload": "Upload",
+    "submit": "Submit",
+    "next": "Next",
+    "previous": "Previous",
+    "back": "Back",
+    "continue": "Continue",
+    "yes": "Yes",
+    "no": "No",
+    "optional": "Optional",
+    "required": "Required"
+  },
+  "footer": {
+    "about": "About Us",
+    "careers": "Careers",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "contact": "Contact Us",
+    "help": "Help Center",
+    "blog": "Blog",
+    "partners": "Partners",
+    "copyright": "© 2025 AI Job Chommie. All rights reserved."
+  },
+  "accessibility": {
+    "skipToContent": "Skip to main content",
+    "menuToggle": "Toggle menu",
+    "closeModal": "Close modal",
+    "languageSelector": "Select language",
+    "voiceToggle": "Toggle voice control",
+    "highContrast": "Toggle high contrast mode"
+  }
+}

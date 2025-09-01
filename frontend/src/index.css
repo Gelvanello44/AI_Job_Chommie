@@ -1,0 +1,84 @@
+/* Global styles */
+body {
+  background-color: #0a0e27;
+  color: white;
+  min-height: 100vh;
+}
+
+/* Print styles for CV templates */
+@media print {
+  @page {
+    margin: 0.75in;
+    size: A4;
+  }
+
+  body {
+    font-size: 12pt;
+    line-height: 1.4;
+    color: black !important;
+    background: white !important;
+  }
+
+  /* Hide non-essential elements when printing */
+  .print\\:hidden {
+    display: none !important;
+  }
+
+  /* Ensure proper page breaks */
+  .break-inside-avoid {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .break-before-page {
+    page-break-before: always;
+    break-before: page;
+  }
+
+  /* CV-specific print styles */
+  .cv-preview {
+    box-shadow: none !important;
+    border: none !important;
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Ensure headings don't break across pages */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  /* Optimize spacing for print */
+  .print\\:mb-2 {
+    margin-bottom: 0.5rem !important;
+  }
+
+  .print\\:text-sm {
+    font-size: 0.875rem !important;
+  }
+}
+
+/* Mobile-friendly chart improvements */
+@media (max-width: 768px) {
+  .recharts-wrapper {
+    font-size: 12px;
+  }
+
+  .recharts-cartesian-axis-tick-value {
+    font-size: 10px;
+  }
+
+  .recharts-legend-wrapper {
+    font-size: 12px;
+  }
+
+  /* Ensure chart containers have minimum touch targets */
+  .recharts-active-dot {
+    r: 6;
+  }
+
+  .recharts-dot {
+    r: 4;
+  }
+}
