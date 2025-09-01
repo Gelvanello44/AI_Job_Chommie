@@ -1,0 +1,723 @@
+{
+  "info": {
+    "name": "AI Job Chommie API",
+    "description": "Complete API testing collection for AI Job Chommie - South African AI-powered job search platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global pre-request script",
+          "console.log('Making request to:', pm.request.url.toString());"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test script",
+          "pm.test('Response time is acceptable', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+          "});",
+          "",
+          "pm.test('Response has valid JSON', function () {",
+          "    pm.response.to.be.json;",
+          "});"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": " Health & Status",
+      "item": [
+        {
+          "name": "Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Health check returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Health check has required fields', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('status');",
+                  "    pm.expect(response).to.have.property('services');",
+                  "    pm.expect(response.services).to.have.property('database');",
+                  "    pm.expect(response.services).to.have.property('redis');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "API Root",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/",
+              "host": ["{{base_url}}"],
+              "path": [""]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": " Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.user) {",
+                  "        pm.environment.set('user_id', response.data.user.id);",
+                  "    }",
+                  "    if (response.data && response.data.tokens) {",
+                  "        pm.environment.set('access_token', response.data.tokens.accessToken);",
+                  "        pm.environment.set('refresh_token', response.data.tokens.refreshToken);",
+                  "    }",
+                  "}",
+                  "",
+                  "pm.test('Registration successful', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 409]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{test_email}}\",\n  \"password\": \"{{test_password}}\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"role\": \"JOB_SEEKER\",\n  \"acceptTerms\": true\n}"
+            },
+            "url": {
+              "raw": "{{api_base}}/auth/register",
+              "host": ["{{api_base}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.user) {",
+                  "        pm.environment.set('user_id', response.data.user.id);",
+                  "    }",
+                  "    if (response.data && response.data.tokens) {",
+                  "        pm.environment.set('access_token', response.data.tokens.accessToken);",
+                  "        pm.environment.set('refresh_token', response.data.tokens.refreshToken);",
+                  "    }",
+                  "}",
+                  "",
+                  "pm.test('Login successful', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Login returns tokens', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.data).to.have.property('tokens');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{test_email}}\",\n  \"password\": \"{{test_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{api_base}}/auth/login",
+              "host": ["{{api_base}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/auth/me",
+              "host": ["{{api_base}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{api_base}}/auth/refresh",
+              "host": ["{{api_base}}"],
+              "path": ["auth", "refresh"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/auth/logout",
+              "host": ["{{api_base}}"],
+              "path": ["auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": " User Profile",
+      "item": [
+        {
+          "name": "Get User Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/profile",
+              "host": ["{{api_base}}"],
+              "path": ["profile"]
+            }
+          }
+        },
+        {
+          "name": "Update User Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Updated\",\n  \"lastName\": \"User\",\n  \"phone\": \"+27123456789\",\n  \"location\": {\n    \"city\": \"Cape Town\",\n    \"province\": \"WESTERN_CAPE\"\n  },\n  \"bio\": \"Software developer passionate about AI and job matching\"\n}"
+            },
+            "url": {
+              "raw": "{{api_base}}/profile",
+              "host": ["{{api_base}}"],
+              "path": ["profile"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": " Jobs",
+      "item": [
+        {
+          "name": "Search Jobs",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.jobs && response.data.jobs.length > 0) {",
+                  "        pm.environment.set('job_id', response.data.jobs[0].id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/jobs/search?query=developer&location=Cape Town&page=1&limit=10",
+              "host": ["{{api_base}}"],
+              "path": ["jobs", "search"],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "developer"
+                },
+                {
+                  "key": "location",
+                  "value": "Cape Town"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Job by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/jobs/{{job_id}}",
+              "host": ["{{api_base}}"],
+              "path": ["jobs", "{{job_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Job Recommendations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/jobs/recommendations?limit=5",
+              "host": ["{{api_base}}"],
+              "path": ["jobs", "recommendations"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Featured Jobs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/jobs/featured?limit=10",
+              "host": ["{{api_base}}"],
+              "path": ["jobs", "featured"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": " Companies",
+      "item": [
+        {
+          "name": "Search Companies",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.companies && response.data.companies.length > 0) {",
+                  "        pm.environment.set('company_id', response.data.companies[0].id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/companies/search?search=tech&page=1&limit=10",
+              "host": ["{{api_base}}"],
+              "path": ["companies", "search"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "tech"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Company by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/companies/{{company_id}}",
+              "host": ["{{api_base}}"],
+              "path": ["companies", "{{company_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Company Jobs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/companies/{{company_id}}/jobs",
+              "host": ["{{api_base}}"],
+              "path": ["companies", "{{company_id}}", "jobs"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": " Job Applications",
+      "item": [
+        {
+          "name": "Apply for Job",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.id) {",
+                  "        pm.environment.set('application_id', response.data.id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobId\": \"{{job_id}}\",\n  \"coverLetter\": \"I am excited to apply for this position as it aligns perfectly with my skills and career goals.\",\n  \"customFields\": {\n    \"availability\": \"Immediately\",\n    \"expectedSalary\": \"40000\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{api_base}}/applications",
+              "host": ["{{api_base}}"],
+              "path": ["applications"]
+            }
+          }
+        },
+        {
+          "name": "Get My Applications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/applications?page=1&limit=10",
+              "host": ["{{api_base}}"],
+              "path": ["applications"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Application by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/applications/{{application_id}}",
+              "host": ["{{api_base}}"],
+              "path": ["applications", "{{application_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Withdraw Application",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/applications/{{application_id}}",
+              "host": ["{{api_base}}"],
+              "path": ["applications", "{{application_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": " CV Management",
+      "item": [
+        {
+          "name": "Get My CVs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/cv",
+              "host": ["{{api_base}}"],
+              "path": ["cv"]
+            }
+          }
+        },
+        {
+          "name": "Create CV Document",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.id) {",
+                  "        pm.environment.set('cv_id', response.data.id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"templateId\": \"modern-template\",\n  \"personalInfo\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"+27123456789\",\n    \"address\": \"Cape Town, South Africa\"\n  },\n  \"experience\": [\n    {\n      \"company\": \"Tech Solutions SA\",\n      \"role\": \"Software Developer\",\n      \"startDate\": \"2021-01-01\",\n      \"endDate\": \"2023-12-31\",\n      \"description\": \"Developed web applications using React and Node.js\"\n    }\n  ],\n  \"education\": [\n    {\n      \"institution\": \"University of Cape Town\",\n      \"degree\": \"Bachelor of Science\",\n      \"fieldOfStudy\": \"Computer Science\",\n      \"startDate\": \"2017-01-01\",\n      \"endDate\": \"2020-12-31\"\n    }\n  ],\n  \"skills\": [\n    {\n      \"name\": \"JavaScript\",\n      \"category\": \"Programming\",\n      \"proficiency\": 90\n    },\n    {\n      \"name\": \"React\",\n      \"category\": \"Frontend\",\n      \"proficiency\": 85\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{api_base}}/cv/document",
+              "host": ["{{api_base}}"],
+              "path": ["cv", "document"]
+            }
+          }
+        },
+        {
+          "name": "Get CV by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/cv/{{cv_id}}",
+              "host": ["{{api_base}}"],
+              "path": ["cv", "{{cv_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": " File Management",
+      "item": [
+        {
+          "name": "Get Upload URL",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fileName\": \"my-cv.pdf\",\n  \"fileType\": \"CV\",\n  \"fileSize\": 1024000\n}"
+            },
+            "url": {
+              "raw": "{{api_base}}/files/upload-url",
+              "host": ["{{api_base}}"],
+              "path": ["files", "upload-url"]
+            }
+          }
+        },
+        {
+          "name": "Get My Files",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/files?type=CV&page=1&limit=10",
+              "host": ["{{api_base}}"],
+              "path": ["files"],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "CV"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": " Skills Assessment",
+      "item": [
+        {
+          "name": "Get Available Assessments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/assessments",
+              "host": ["{{api_base}}"],
+              "path": ["assessments"]
+            }
+          }
+        },
+        {
+          "name": "Start Assessment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assessmentType\": \"technical\",\n  \"category\": \"programming\"\n}"
+            },
+            "url": {
+              "raw": "{{api_base}}/assessments/start",
+              "host": ["{{api_base}}"],
+              "path": ["assessments", "start"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": " Quota Management",
+      "item": [
+        {
+          "name": "Get My Quota",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/quota",
+              "host": ["{{api_base}}"],
+              "path": ["quota"]
+            }
+          }
+        },
+        {
+          "name": "Get Quota Usage",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base}}/quota/usage",
+              "host": ["{{api_base}}"],
+              "path": ["quota", "usage"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
