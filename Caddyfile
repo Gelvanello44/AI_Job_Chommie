@@ -1,0 +1,101 @@
+# ============================================
+# AI Job Chommie - Caddy Configuration
+# Automatic HTTPS with Let's Encrypt
+# ============================================
+
+# Production configuration for aijobchommie.co.za
+aijobchommie.co.za, www.aijobchommie.co.za {
+    # Enable compression
+    encode gzip zstd
+
+    # Security headers
+    header {
+        # HSTS
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        
+        # Security headers
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        
+        # CSP Header
+        Content-Security-Policy "default-src 'self' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' https://api-inference.huggingface.co wss://aijobchommie.co.za https://o4508440472616960.ingest.us.sentry.io;"
+        
+        # Permissions Policy
+        Permissions-Policy "geolocation=(), microphone=(), camera=()"
+        
+        # Remove server header
+        -Server
+    }
+
+    # Handle API requests
+    handle /api/* {
+        reverse_proxy backend:5000 {
+            header_up Host {host}
+            header_up X-Real-IP {remote}
+            header_up X-Forwarded-For {remote}
+            header_up X-Forwarded-Proto {scheme}
+            
+            # Timeouts
+            transport http {
+                dial_timeout 30s
+                response_header_timeout 30s
+            }
+        }
+    }
+
+    # Handle WebSocket connections
+    handle /ws/* {
+        reverse_proxy backend:5000 {
+            header_up Host {host}
+            header_up X-Real-IP {remote}
+            header_up X-Forwarded-For {remote}
+            header_up X-Forwarded-Proto {scheme}
+            header_up Connection "upgrade"
+            header_up Upgrade "websocket"
+        }
+    }
+
+    # Health check endpoint
+    handle /health {
+        respond "OK" 200
+    }
+
+    # Serve frontend
+    handle {
+        reverse_proxy frontend:80 {
+            header_up Host {host}
+            header_up X-Real-IP {remote}
+            header_up X-Forwarded-For {remote}
+            header_up X-Forwarded-Proto {scheme}
+        }
+    }
+
+    # Rate limiting
+    @ratelimit {
+        path /api/auth/*
+        path /api/login
+        path /api/signup
+        path /api/password-reset
+    }
+    rate_limit @ratelimit {
+        zone dynamic 10r/m
+        key {remote_host}
+    }
+
+    # Logging
+    log {
+        output file /var/log/caddy/access.log {
+            roll_size 100mb
+            roll_keep 10
+            roll_keep_for 720h
+        }
+        format json
+    }
+}
+
+# Redirect non-www to www
+aijobchommie.co.za {
+    redir https://www.aijobchommie.co.za{uri} permanent
+}

@@ -1,0 +1,110 @@
+name: Deploy AI Job Chommie
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        
+    - name: Install Backend Dependencies
+      working-directory: ./backend
+      run: npm ci
+      
+    - name: Run Backend Tests
+      working-directory: ./backend
+      run: npm test --passWithNoTests
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        REDIS_URL: ${{ secrets.REDIS_URL }}
+        
+  test-frontend:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        
+    - name: Install Frontend Dependencies
+      working-directory: ./frontend
+      run: npm ci
+      
+    - name: Build Frontend
+      working-directory: ./frontend
+      run: npm run build
+      
+    - name: Run Frontend Tests
+      working-directory: ./frontend
+      run: npm test --passWithNoTests
+
+  deploy-backend-koyeb:
+    needs: [test-backend]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Deploy to Koyeb
+      env:
+        KOYEB_API_TOKEN: ${{ secrets.KOYEB_API_TOKEN }}
+      run: |
+        curl -X POST https://app.koyeb.com/v1/services/redeploy \
+          -H "Authorization: Bearer $KOYEB_API_TOKEN" \
+          -H "Content-Type: application/json" \
+          -d '{"service_id": "ai-job-chommie-backend"}'
+
+  deploy-frontend-vercel:
+    needs: [test-frontend]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        
+    - name: Install Vercel CLI
+      run: npm install -g vercel
+      
+    - name: Pull Vercel Environment
+      working-directory: ./frontend
+      run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+      
+    - name: Build Project
+      working-directory: ./frontend
+      run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+      
+    - name: Deploy to Vercel
+      working-directory: ./frontend
+      run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+  notify-deployment:
+    needs: [deploy-backend-koyeb, deploy-frontend-vercel]
+    runs-on: ubuntu-latest
+    if: success()
+    
+    steps:
+    - name: Deployment Success
+      run: |
+        echo " Deployment Successful!"
+        echo "Frontend: https://ai-job-chommie.vercel.app"
+        echo "Backend: https://ai-job-chommie-backend.koyeb.app"
