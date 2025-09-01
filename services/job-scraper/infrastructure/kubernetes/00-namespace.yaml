@@ -1,0 +1,68 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: job-scraper
+  labels:
+    name: job-scraper
+    monitoring: prometheus
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: job-scraper-config
+  namespace: job-scraper
+data:
+  ENVIRONMENT: "production"
+  LOG_LEVEL: "INFO"
+  SERVICE_NAME: "job-scraping-service"
+  API_HOST: "0.0.0.0"
+  API_PORT: "8000"
+  API_PREFIX: "/api/v1"
+  GRAPHQL_PATH: "/graphql"
+  WS_PATH: "/ws"
+  
+  # Performance settings
+  MAX_CONCURRENT_SCRAPERS: "100"
+  SCRAPER_TIMEOUT: "60"
+  RETRY_ATTEMPTS: "3"
+  RETRY_DELAY: "5"
+  USER_AGENT_ROTATION: "True"
+  
+  # Rate limiting
+  RATE_LIMIT_PER_DOMAIN: "10"
+  RATE_LIMIT_WINDOW: "60"
+  ADAPTIVE_RATE_LIMITING: "True"
+  
+  # Anti-detection
+  FINGERPRINT_ROTATION: "True"
+  TLS_RANDOMIZATION: "True"
+  BEHAVIORAL_MIMICKING: "True"
+  
+  # Monitoring
+  PROMETHEUS_PORT: "9090"
+  
+  # Performance targets
+  TARGET_DAILY_JOBS: "50000"
+  TARGET_RESPONSE_TIME_MS: "100"
+  TARGET_UPTIME_PERCENT: "99.95"
+  MAX_CONCURRENT_UPDATES: "1000"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: job-scraper-secrets
+  namespace: job-scraper
+type: Opaque
+stringData:
+  DATABASE_URL: "postgresql://jobscraper:password@postgres-service:5432/jobscraper"
+  REDIS_URL: "redis://:password@redis-service:6379/0"
+  REDIS_CLUSTER_NODES: "redis-0.redis-service:6379,redis-1.redis-service:6379,redis-2.redis-service:6379"
+  KAFKA_BOOTSTRAP_SERVERS: "kafka-0.kafka-service:9092,kafka-1.kafka-service:9092,kafka-2.kafka-service:9092"
+  SERP_API_KEY: "your_serpapi_key"
+  HUGGINGFACE_API_KEY: "your_huggingface_key"
+  CAPTCHA_SOLVER_API_KEY: "your_captcha_key"
+  PROXY_API_KEY: "your_proxy_key"
+  SENTRY_DSN: "your_sentry_dsn"
