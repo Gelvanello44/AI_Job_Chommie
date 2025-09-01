@@ -1,0 +1,35 @@
+[
+  {
+    "id": "hm-za-001",
+    "company": "CapeTech Ventures",
+    "role": "Senior Full-Stack Engineer",
+    "location": "Cape Town, Western Cape (Hybrid)",
+    "contactType": "referral",
+    "seniority": "Senior",
+    "notes": "High-growth fintech portfolio company. Prefers referrals via alum network.",
+    "hints": ["Highlight fintech, PCI experience", "Demonstrate production React + Node", "Include SA market experience"],
+    "lastSeen": "2025-08-15"
+  },
+  {
+    "id": "hm-za-002",
+    "company": "Joburg Data Lab",
+    "role": "Data Analyst (Growth Insights)",
+    "location": "Johannesburg, Gauteng (Onsite)",
+    "contactType": "recruiter",
+    "seniority": "Mid",
+    "notes": "Early conversation stage via specialist recruiter. Strong SQL + storytelling required.",
+    "hints": ["Prepare portfolio with 2 dashboards", "Show A/B test literacy", "Confidence with SA consumer data"],
+    "lastSeen": "2025-08-20"
+  },
+  {
+    "id": "hm-za-003",
+    "company": "GreenGrid Energy",
+    "role": "Product Manager (B2B SaaS)",
+    "location": "Remote (ZA preferred)",
+    "contactType": "referral",
+    "seniority": "Senior",
+    "notes": "Stealth transition from services to SaaS. Hiring quietly; network-led introductions only.",
+    "hints": ["Demonstrate roadmap ownership", "Energy sector familiarity is a plus", "Metrics-driven storytelling"],
+    "lastSeen": "2025-08-25"
+  }
+]
