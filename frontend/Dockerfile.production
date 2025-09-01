@@ -1,0 +1,111 @@
+# ============================================
+# AI Job Chommie Frontend - Production Dockerfile
+# Multi-stage build with NGINX and optimization
+# ============================================
+
+# Stage 1: Dependencies Installer
+FROM node:20-alpine AS deps
+LABEL stage=deps
+LABEL maintainer="AI Job Chommie Team"
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies with frozen lockfile
+RUN npm ci --only=production && \
+    npm cache clean --force
+
+# Stage 2: Builder
+FROM node:20-alpine AS builder
+LABEL stage=builder
+
+WORKDIR /app
+
+# Copy package files and install all dependencies
+COPY package*.json ./
+RUN npm ci && npm cache clean --force
+
+# Copy source code
+COPY . .
+
+# Build arguments for environment variables
+ARG VITE_API_URL
+ARG VITE_APP_URL
+ARG VITE_SENTRY_DSN
+ARG VITE_GA_ID
+ARG VITE_ENVIRONMENT=production
+
+# Set build-time environment variables
+ENV VITE_API_URL=$VITE_API_URL \
+    VITE_APP_URL=$VITE_APP_URL \
+    VITE_SENTRY_DSN=$VITE_SENTRY_DSN \
+    VITE_GA_ID=$VITE_GA_ID \
+    VITE_ENVIRONMENT=$VITE_ENVIRONMENT
+
+# Build the application
+RUN npm run build
+
+# Stage 3: Security Scanner
+FROM aquasec/trivy:latest AS scanner
+LABEL stage=scanner
+
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
+RUN trivy fs --no-progress --security-checks vuln --exit-code 0 .
+
+# Stage 4: Production Runtime with NGINX
+FROM nginx:alpine AS runtime
+LABEL stage=runtime
+LABEL maintainer="AI Job Chommie Team"
+LABEL version="1.0.0"
+
+# Install runtime dependencies
+RUN apk add --no-cache \
+    curl \
+    tzdata \
+    && apk upgrade --no-cache
+
+# Set timezone
+ENV TZ=Africa/Johannesburg
+
+# Remove default nginx config
+RUN rm -rf /etc/nginx/conf.d/*
+
+# Copy custom nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx-app.conf /etc/nginx/conf.d/default.conf
+
+# Copy built application from builder
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Create nginx user and set permissions
+RUN chown -R nginx:nginx /usr/share/nginx/html && \
+    chmod -R 755 /usr/share/nginx/html && \
+    chown -R nginx:nginx /var/cache/nginx && \
+    chown -R nginx:nginx /var/log/nginx && \
+    chown -R nginx:nginx /etc/nginx/conf.d && \
+    touch /var/run/nginx.pid && \
+    chown -R nginx:nginx /var/run/nginx.pid
+
+# Security headers and optimizations
+RUN echo "server_tokens off;" >> /etc/nginx/conf.d/security.conf && \
+    echo "add_header X-Frame-Options SAMEORIGIN always;" >> /etc/nginx/conf.d/security.conf && \
+    echo "add_header X-Content-Type-Options nosniff always;" >> /etc/nginx/conf.d/security.conf && \
+    echo "add_header X-XSS-Protection '1; mode=block' always;" >> /etc/nginx/conf.d/security.conf && \
+    echo "add_header Referrer-Policy 'strict-origin-when-cross-origin' always;" >> /etc/nginx/conf.d/security.conf && \
+    echo "add_header Content-Security-Policy \"default-src 'self' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' data: https:; img-src 'self' data: https: blob:; connect-src 'self' https: wss:;\" always;" >> /etc/nginx/conf.d/security.conf
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost/ || exit 1
+
+# Switch to nginx user
+USER nginx
+
+# Expose port
+EXPOSE 80
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

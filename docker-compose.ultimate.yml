@@ -1,0 +1,540 @@
+# ============================================
+# AI Job Chommie - Ultimate Production Docker Compose
+# World-class deployment with monitoring, scaling, and resilience
+# ============================================
+
+version: '3.9'
+
+x-common-variables: &common-variables
+  TZ: Africa/Johannesburg
+  NODE_ENV: production
+
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+    tag: "{{.Name}}"
+
+x-healthcheck-defaults: &healthcheck-defaults
+  interval: 30s
+  timeout: 10s
+  retries: 3
+  start_period: 40s
+
+services:
+  # ===========================================
+  # LOAD BALANCER & REVERSE PROXY
+  # ===========================================
+  traefik:
+    image: traefik:v3.0
+    container_name: aijc-traefik
+    restart: always
+    command:
+      - --api.dashboard=true
+      - --api.debug=false
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.letsencrypt.acme.tlschallenge=true
+      - --certificatesresolvers.letsencrypt.acme.email=admin@aijobchommie.co.za
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+      - --metrics.prometheus=true
+      - --metrics.prometheus.buckets=0.1,0.3,1.2,5.0
+      - --accesslog=true
+      - --log.level=INFO
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik-certificates:/letsencrypt
+      - traefik-logs:/var/log
+    networks:
+      - aijc-public
+      - monitoring
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.aijobchommie.co.za`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.middlewares=auth"
+      - "traefik.http.middlewares.auth.basicauth.users=admin:$$2y$$10$$..."
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # ===========================================
+  # FRONTEND - WITH AUTO-SCALING
+  # ===========================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.production
+      args:
+        VITE_API_URL: ${VITE_API_URL:-https://api.aijobchommie.co.za}
+        VITE_APP_URL: ${VITE_APP_URL:-https://www.aijobchommie.co.za}
+        VITE_SENTRY_DSN: ${VITE_SENTRY_DSN}
+    image: aijobchommie/frontend:latest
+    container_name: aijc-frontend
+    restart: always
+    environment:
+      <<: *common-variables
+    networks:
+      - aijc-public
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`www.aijobchommie.co.za`, `aijobchommie.co.za`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
+      - "traefik.http.middlewares.frontend-compress.compress=true"
+      - "traefik.http.routers.frontend.middlewares=frontend-compress"
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+    logging: *default-logging
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+
+  # ===========================================
+  # BACKEND API - WITH AUTO-SCALING
+  # ===========================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.production
+    image: aijobchommie/backend:latest
+    container_name: aijc-backend
+    restart: always
+    environment:
+      <<: *common-variables
+      DATABASE_URL: postgresql://${DB_USER:-aijc}:${DB_PASSWORD}@postgres:5432/${DB_NAME:-aijobchommie}?schema=public&pool_timeout=0
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+      JWT_SECRET: ${JWT_SECRET}
+      HUGGINGFACE_API_TOKEN: ${HUGGINGFACE_API_TOKEN}
+      SENTRY_DSN: ${SENTRY_DSN}
+      EMAIL_HOST: ${EMAIL_HOST}
+      EMAIL_PORT: ${EMAIL_PORT}
+      EMAIL_USER: ${EMAIL_USER}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      S3_BUCKET: ${S3_BUCKET}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - aijc-public
+      - aijc-private
+    volumes:
+      - backend-logs:/app/logs
+      - backend-uploads:/app/uploads
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`api.aijobchommie.co.za`)"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.backend.loadbalancer.server.port=5000"
+      - "traefik.http.middlewares.backend-ratelimit.ratelimit.average=100"
+      - "traefik.http.routers.backend.middlewares=backend-ratelimit"
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+    logging: *default-logging
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+
+  # ===========================================
+  # JOB SCRAPER SERVICE
+  # ===========================================
+  job-scraper:
+    build:
+      context: ./services/job-scraper
+      dockerfile: Dockerfile
+    image: aijobchommie/job-scraper:latest
+    container_name: aijc-job-scraper
+    restart: always
+    environment:
+      <<: *common-variables
+      BACKEND_URL: http://backend:5000
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/1
+      SERPAPI_KEY: ${SERPAPI_KEY}
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+    depends_on:
+      - backend
+      - redis
+      - rabbitmq
+    networks:
+      - aijc-private
+    volumes:
+      - scraper-cache:/app/cache
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # ===========================================
+  # WORKER SERVICE (Background Jobs)
+  # ===========================================
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.production
+    image: aijobchommie/backend:latest
+    container_name: aijc-worker
+    restart: always
+    command: ["node", "dist/workers/workerManager.js"]
+    environment:
+      <<: *common-variables
+      DATABASE_URL: postgresql://${DB_USER:-aijc}:${DB_PASSWORD}@postgres:5432/${DB_NAME:-aijobchommie}?schema=public
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/2
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    networks:
+      - aijc-private
+    volumes:
+      - worker-logs:/app/logs
+    logging: *default-logging
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # ===========================================
+  # DATABASE - PostgreSQL with Replication
+  # ===========================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: aijc-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME:-aijobchommie}
+      POSTGRES_USER: ${DB_USER:-aijc}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --data-checksums"
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - postgres-backups:/backups
+    networks:
+      - aijc-private
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-aijc} -d ${DB_NAME:-aijobchommie}"]
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+    command: >
+      postgres
+      -c max_connections=200
+      -c shared_buffers=256MB
+      -c effective_cache_size=1GB
+      -c maintenance_work_mem=64MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c work_mem=1310kB
+      -c min_wal_size=1GB
+      -c max_wal_size=4GB
+      -c max_worker_processes=4
+      -c max_parallel_workers_per_gather=2
+      -c max_parallel_workers=4
+      -c max_parallel_maintenance_workers=2
+
+  # ===========================================
+  # CACHE - Redis Cluster
+  # ===========================================
+  redis:
+    image: redis:7-alpine
+    container_name: aijc-redis
+    restart: always
+    command: >
+      redis-server
+      --requirepass ${REDIS_PASSWORD}
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --appendonly yes
+      --appendfsync everysec
+      --tcp-backlog 511
+      --timeout 0
+      --tcp-keepalive 300
+      --databases 16
+    volumes:
+      - redis-data:/data
+    networks:
+      - aijc-private
+    ports:
+      - "127.0.0.1:6379:6379"
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # ===========================================
+  # MESSAGE QUEUE - RabbitMQ
+  # ===========================================
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: aijc-rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-admin}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+      RABBITMQ_DEFAULT_VHOST: aijobchommie
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - aijc-private
+      - monitoring
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
+    healthcheck:
+      <<: *healthcheck-defaults
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # ===========================================
+  # MONITORING - Prometheus
+  # ===========================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: aijc-prometheus
+    restart: always
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - monitoring
+      - aijc-private
+    ports:
+      - "127.0.0.1:9090:9090"
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # ===========================================
+  # MONITORING - Grafana
+  # ===========================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: aijc-grafana
+    restart: always
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+    networks:
+      - monitoring
+      - aijc-public
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.aijobchommie.co.za`)"
+      - "traefik.http.routers.grafana.entrypoints=websecure"
+      - "traefik.http.routers.grafana.tls.certresolver=letsencrypt"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+  # ===========================================
+  # MONITORING - Loki (Log Aggregation)
+  # ===========================================
+  loki:
+    image: grafana/loki:latest
+    container_name: aijc-loki
+    restart: always
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./monitoring/loki/loki-config.yaml:/etc/loki/local-config.yaml:ro
+      - loki-data:/loki
+    networks:
+      - monitoring
+    ports:
+      - "127.0.0.1:3100:3100"
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # ===========================================
+  # MONITORING - Promtail (Log Collector)
+  # ===========================================
+  promtail:
+    image: grafana/promtail:latest
+    container_name: aijc-promtail
+    restart: always
+    command: -config.file=/etc/promtail/config.yml
+    volumes:
+      - ./monitoring/promtail/promtail-config.yaml:/etc/promtail/config.yml:ro
+      - /var/log:/var/log:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    networks:
+      - monitoring
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+
+  # ===========================================
+  # BACKUP SERVICE
+  # ===========================================
+  backup:
+    image: postgres:16-alpine
+    container_name: aijc-backup
+    restart: always
+    environment:
+      PGPASSWORD: ${DB_PASSWORD}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      S3_BUCKET: ${BACKUP_S3_BUCKET}
+    volumes:
+      - postgres-backups:/backups
+      - ./scripts/backup.sh:/backup.sh:ro
+    networks:
+      - aijc-private
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["while true; do /backup.sh; sleep 86400; done"]
+    depends_on:
+      - postgres
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+
+# ===========================================
+# NETWORKS
+# ===========================================
+networks:
+  aijc-public:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+
+  aijc-private:
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.21.0.0/24
+
+  monitoring:
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.22.0.0/24
+
+# ===========================================
+# VOLUMES
+# ===========================================
+volumes:
+  # Application data
+  postgres-data:
+    driver: local
+  postgres-backups:
+    driver: local
+  redis-data:
+    driver: local
+  rabbitmq-data:
+    driver: local
+  
+  # Application storage
+  backend-logs:
+    driver: local
+  backend-uploads:
+    driver: local
+  worker-logs:
+    driver: local
+  scraper-cache:
+    driver: local
+  
+  # Infrastructure
+  traefik-certificates:
+    driver: local
+  traefik-logs:
+    driver: local
+  
+  # Monitoring
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+  loki-data:
+    driver: local

@@ -1,0 +1,123 @@
+# ============================================
+# AI Job Chommie Backend - Production Dockerfile
+# Multi-stage, optimized build with security hardening
+# ============================================
+
+# Stage 1: Dependencies Builder
+FROM node:20-alpine AS deps
+LABEL stage=deps
+LABEL maintainer="AI Job Chommie Team"
+
+# Install build dependencies
+RUN apk add --no-cache python3 make g++ git
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY prisma ./prisma/
+
+# Install production dependencies with exact versions
+RUN npm ci --only=production && \
+    npm cache clean --force
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Stage 2: Source Builder
+FROM node:20-alpine AS builder
+LABEL stage=builder
+
+# Install build dependencies
+RUN apk add --no-cache python3 make g++
+
+WORKDIR /app
+
+# Copy package files and install all dependencies
+COPY package*.json ./
+RUN npm ci && npm cache clean --force
+
+# Copy source code
+COPY . .
+
+# Generate Prisma client
+COPY --from=deps /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=deps /app/node_modules/@prisma ./node_modules/@prisma
+
+# Build TypeScript
+RUN npm run build
+
+# Remove dev dependencies
+RUN npm prune --production
+
+# Stage 3: Security Scanner
+FROM aquasec/trivy:latest AS scanner
+LABEL stage=scanner
+
+WORKDIR /app
+COPY --from=builder /app/package*.json ./
+RUN trivy fs --no-progress --security-checks vuln --exit-code 0 .
+
+# Stage 4: Production Runtime
+FROM node:20-alpine AS runtime
+LABEL stage=runtime
+LABEL maintainer="AI Job Chommie Team"
+LABEL version="1.0.0"
+
+# Install runtime dependencies and security updates
+RUN apk add --no-cache \
+    dumb-init \
+    curl \
+    tzdata \
+    && apk upgrade --no-cache
+
+# Create non-root user with specific UID/GID
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001 -G nodejs
+
+# Set timezone
+ENV TZ=Africa/Johannesburg
+
+WORKDIR /app
+
+# Copy production dependencies from deps stage
+COPY --from=deps --chown=nodejs:nodejs /app/node_modules ./node_modules
+COPY --from=deps --chown=nodejs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=deps --chown=nodejs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
+
+# Copy built application from builder stage
+COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
+COPY --from=builder --chown=nodejs:nodejs /app/prisma ./prisma
+
+# Copy necessary config files
+COPY --chown=nodejs:nodejs package*.json ./
+COPY --chown=nodejs:nodejs tsconfig*.json ./
+
+# Create necessary directories with proper permissions
+RUN mkdir -p /app/logs /app/uploads /app/temp && \
+    chown -R nodejs:nodejs /app/logs /app/uploads /app/temp
+
+# Security: Set read-only root filesystem
+RUN chmod -R 755 /app && \
+    chmod -R 777 /app/logs /app/uploads /app/temp
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD node -e "require('http').get('http://localhost:5000/health', (r) => {r.statusCode === 200 ? process.exit(0) : process.exit(1)})" || exit 1
+
+# Switch to non-root user
+USER nodejs
+
+# Expose port
+EXPOSE 5000
+
+# Environment variables for production
+ENV NODE_ENV=production \
+    NODE_OPTIONS="--max-old-space-size=2048 --enable-source-maps" \
+    PORT=5000
+
+# Use dumb-init to handle signals properly
+ENTRYPOINT ["dumb-init", "--"]
+
+# Start the application
+CMD ["node", "--enable-source-maps", "--trace-warnings", "dist/main.js"]
