@@ -453,25 +453,53 @@ socket.on('ai.insight', (data) => { /* AI-generated insight */ })
 
 <br/>
 
+## **LEGAL ENTITY STATUS**
+
+### **Company Registration**
+
+AI Job Chommie operates as a legally registered entity in the Republic of South Africa. The company maintains full compliance with all regulatory requirements and has established the necessary infrastructure for legitimate business operations.
+
+### **Documentation on File**
+
+| Document Type | Reference | Status |
+|---------------|-----------|--------|
+| **CIPC Registration** | CoR15.1A Certificate (9440573320) | Active and compliant |
+| **Tax Registration** | SARS Tax Number (9481880228) | Registered and compliant |
+| **Banking Infrastructure** | Capitec Business Account | Operational |
+
+### **Due Diligence Package**
+
+For serious investors, partners, and enterprise clients, a comprehensive due diligence package is available upon request. This package includes:
+
+- Company registration certificates from the Companies and Intellectual Property Commission (CIPC)
+- South African Revenue Service (SARS) tax clearance documentation
+- Banking verification and financial infrastructure confirmation
+- Detailed business plan and financial projections
+- Intellectual property documentation and technology stack verification
+
+All documentation undergoes regular updates to maintain compliance with South African business regulations. Verification requests can be submitted through our official communication channels with appropriate non-disclosure agreements in place.
+
 ## **CONTACT**
 
 <div align="center">
   <table style="border: none;">
     <tr>
       <td align="center" style="padding: 20px; border: none;">
-        <strong>Business Development</strong><br/>
-        business@aijobchommie.co.za<br/>
-        +27 (0)10 500 8000
+        <strong>General Enquiries & Support</strong><br/>
+        admin@aijobchommie.co.za<br/>
+        Phone: 068 301 5006
       </td>
       <td align="center" style="padding: 20px; border: none;">
-        <strong>Technical Support</strong><br/>
-        support@aijobchommie.co.za<br/>
-        Mon-Fri 8AM-5PM SAST
+        <strong>Virtual Office Address</strong><br/>
+        Regus – Boardwalk Office Park<br/>
+        2nd Avenue, Summerstrand<br/>
+        Gqeberha, 6001<br/>
+        (Mail handling only)
       </td>
       <td align="center" style="padding: 20px; border: none;">
-        <strong>Partnership Opportunities</strong><br/>
-        partners@aijobchommie.co.za<br/>
-        Johannesburg, Cape Town
+        <strong>Registered in South Africa</strong><br/>
+        Documentation available on request<br/>
+        Business hours: Mon–Fri 08:00–17:00 SAST
       </td>
     </tr>
   </table>
