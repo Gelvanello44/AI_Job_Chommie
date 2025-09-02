@@ -8,11 +8,11 @@
   <br/>
   
   <p align="center">
-    <img src="https://img.shields.io/badge/SOUTH%20AFRICAN-BUILT-000000?style=flat-square&labelColor=1a1a1a" alt="South African Built" />
-    <img src="https://img.shields.io/badge/MARKET%20VALUE-R15M-000000?style=flat-square&labelColor=1a1a1a" alt="Market Value" />
-    <img src="https://img.shields.io/badge/USERS-15K%2B-000000?style=flat-square&labelColor=1a1a1a" alt="Active Users" />
+    <img src="https://img.shields.io/badge/YOUTH%20FOCUSED-80%25%20USERS%2018--35-000000?style=flat-square&labelColor=1a1a1a" alt="Youth Focused" />
+    <img src="https://img.shields.io/badge/MARKET%20VALUE-R14.4M-000000?style=flat-square&labelColor=1a1a1a" alt="Market Value" />
     <img src="https://img.shields.io/badge/POPIA-COMPLIANT-000000?style=flat-square&labelColor=1a1a1a" alt="POPIA Compliant" />
     <img src="https://img.shields.io/badge/BEE-LEVEL%204-000000?style=flat-square&labelColor=1a1a1a" alt="BEE Level 4" />
+    <img src="https://img.shields.io/badge/NYDA-ALIGNED-000000?style=flat-square&labelColor=1a1a1a" alt="NYDA Aligned" />
   </p>
 </div>
 
@@ -360,23 +360,24 @@ kubectl get pods -n ai-job-chommie
 
 ### **Realistic Growth Projections (South African Market)**
 
-| Period | ARR (ZAR) | Active Users | Platform Valuation (ZAR) |
-|--------|-----------|--------------|-------------------------|
-| **6 Months** | R480,000 | 5,000 | R5 million |
-| **12 Months** | R1.2 million | 15,000 | R15 million |
-| **24 Months** | R4.8 million | 50,000 | R60 million |
-| **36 Months** | R12 million | 120,000 | R150 million |
-| **48 Months** | R30 million | 300,000 | R375 million |
+| Period | Total Users | Youth (18-35) | Paying Users | Sponsored Users | Total ARR (ZAR) | Platform Valuation |
+|--------|-------------|---------------|--------------|-----------------|-----------------|--------------------|
+| **6 Months** | 5,000 | 4,000 (80%) | 1,000 | 3,000 | R384,000 | R4.8 million |
+| **12 Months** | 15,000 | 12,000 (80%) | 4,000 | 8,000 | R1,152,000 | R14.4 million |
+| **18 Months** | 35,000 | 28,000 (80%) | 10,000 | 18,000 | R2,688,000 | R33.6 million |
+| **24 Months** | 60,000 | 48,000 (80%) | 20,000 | 28,000 | R4,608,000 | R57.6 million |
+| **36 Months** | 120,000 | 96,000 (80%) | 45,000 | 51,000 | R9,216,000 | R115.2 million |
+| **48 Months** | 250,000 | 200,000 (80%) | 100,000 | 100,000 | R19,200,000 | R240 million |
 
 ### **Platform Valuation Analysis**
 
-The valuation of AI Job Chommie is grounded in realistic market fundamentals specific to the South African context. At the current stage, with functional technology and proven market fit, the platform carries a conservative valuation of **R15 million**. This assessment considers multiple factors:
+The valuation of AI Job Chommie is grounded in realistic market fundamentals specific to the South African context. At the current stage, with functional technology and proven market fit, the platform carries a conservative valuation of **R14.4 million**. This assessment considers multiple factors:
 
 **Technology Asset Value**: The platform's sophisticated AI infrastructure, including custom machine learning models trained specifically on South African job market data, represents approximately R3 million in development costs. The proprietary matching algorithms and automated application system constitute intellectual property that would require significant investment to replicate.
 
 **Market Position**: As one of the first automated job application platforms designed specifically for South African job seekers, AI Job Chommie occupies a unique market position. The platform addresses critical pain points in a market where traditional job boards have failed to solve the fundamental problem of application volume and response rates.
 
-**Revenue Multiple**: Based on projected annual recurring revenue of R1.2 million within 12 months, applying a conservative 12.5x revenue multiple (standard for early-stage SaaS platforms in emerging markets) yields the R15 million valuation. This multiple reflects both the growth potential and the inherent risks of the South African market.
+**Revenue Multiple**: Based on projected annual recurring revenue of R1.152 million within 12 months, applying a conservative 12.5x revenue multiple (standard for early-stage SaaS platforms in emerging markets) yields the R14.4 million valuation. This multiple reflects both the growth potential and the inherent risks of the South African market.
 
 **User Economics**: With an average customer lifetime value of R150 (based on 18-month average retention at R8/month) and customer acquisition costs under R30, the unit economics demonstrate strong fundamentals that justify the valuation.
 
@@ -452,6 +453,18 @@ socket.on('ai.insight', (data) => { /* AI-generated insight */ })
 - Platform valuation target: R150 million
 
 <br/>
+
+## **YOUTH EMPLOYMENT PRIORITY**
+
+AI Job Chommie operates with an explicit mandate to prioritize South African youth aged 18-35, in alignment with the National Youth Policy 2020-2030. Our comprehensive Youth Employment Priority Policy ensures that 80% of platform resources are dedicated to addressing youth unemployment.
+
+**Key Youth Initiatives:**
+- 70% of daily auto-applications reserved for users aged 18-29
+- Subsidized access programs through corporate and government partnerships
+- Cost as low as R60 per youth per year for bulk sponsorships
+- Direct integration with NYDA, SETAs, and YES Initiative
+
+For detailed information on youth sponsorship opportunities and partnership models, please refer to our [Youth Employment Priority Policy](YOUTH_EMPLOYMENT_POLICY.md).
 
 ## **LEGAL ENTITY STATUS**
 
